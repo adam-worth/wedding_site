@@ -30,19 +30,7 @@
       noscript { display: block; margin-top: 10px; }
       a { color: #7dd3fc; }
 
-      /* Label above the maze (outside the canvas) */
       #gameBlock { display: inline-block; width: fit-content; max-width: 100%; }
-      .title-bar {
-        margin: 0 0 10px;
-        padding: 10px 12px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        border-radius: 10px;
-        background: rgba(2, 6, 23, 0.65);
-        color: var(--fg);
-        text-align: center;
-        font: 16px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        letter-spacing: 0.04em;
-      }
 
       #stage {
         position: relative;
@@ -82,9 +70,9 @@
       .rsvp-btn:hover { border-color: rgba(226, 232, 240, 0.6); }
       .rsvp-btn:focus { outline: 2px solid rgba(125, 211, 252, 0.7); outline-offset: 3px; }
 
-      /* NEW: Red RSVP styling when you win */
+      /* Red RSVP styling when you win */
       .rsvp-btn.win {
-        background: rgba(185, 28, 28, 0.92);   /* red */
+        background: rgba(185, 28, 28, 0.92);
         border-color: rgba(254, 202, 202, 0.55);
         color: #fff;
       }
@@ -93,7 +81,7 @@
         background: rgba(220, 38, 38, 0.95);
       }
 
-      /* Story overlay (covers the maze completely until Enter) */
+      /* Story overlay (covers the maze completely until Enter/click) */
       .story-overlay{
         position:absolute;
         inset:0; /* covers the entire stage (including padding) */
@@ -159,10 +147,6 @@
   <body>
     <div id="wrap">
       <div id="gameBlock">
-
-        <!-- FIX: this element was missing; JS expects it -->
-        <div id="titleBar" class="title-bar">Wedding Maze — Press Enter</div>
-
         <div id="stage">
           <canvas id="game" aria-label="Wedding Maze"></canvas>
 
@@ -253,7 +237,6 @@
           const ctx = canvas.getContext("2d", { alpha: false });
           ctx.imageSmoothingEnabled = false;
 
-          const titleBar = document.getElementById("titleBar"); // now exists
           const rsvpBtn = document.getElementById("rsvpBtn");
           const RSVP_URL = "./rsvp.html";
           rsvpBtn.href = RSVP_URL;
@@ -297,7 +280,7 @@
           function resize() {
             const pad = 24;
             const maxW = Math.max(320, window.innerWidth - pad);
-            const maxH = Math.max(240, window.innerHeight - 140);
+            const maxH = Math.max(240, window.innerHeight - 120);
             const MAX_SCALE = 3;
             const scale = Math.max(1, Math.min(MAX_SCALE, Math.floor(Math.min(maxW / W, maxH / H))));
             canvas.style.width = (W * scale) + "px";
@@ -540,15 +523,6 @@
             drawBride();
             drawGroom();
 
-            // Update title ABOVE the maze (defensive: only if it exists)
-            if (titleBar) {
-              const label =
-                (state.screen === "story")
-                  ? "Wedding Maze — Press Enter"
-                  : "Find the bride";
-              titleBar.textContent = (state.screen === "win") ? "YOU MADE IT!" : label;
-            }
-
             if (state.screen !== "win") {
               rsvpBtn.style.display = "none";
               rsvpBtn.classList.remove("win");
@@ -560,7 +534,7 @@
 
             drawFrame();
 
-            // Ensure overlay visibility tracks state (defensive)
+            // Keep overlay visibility in sync (defensive)
             syncStoryOverlay();
           }
 
