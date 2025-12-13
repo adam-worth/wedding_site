@@ -30,7 +30,7 @@
       noscript { display: block; margin-top: 10px; }
       a { color: #7dd3fc; }
 
-      /* NEW: label above the maze (outside the canvas) */
+      /* Label above the maze (outside the canvas) */
       #gameBlock { display: inline-block; width: fit-content; max-width: 100%; }
       .title-bar {
         margin: 0 0 10px;
@@ -52,6 +52,7 @@
         border: 2px solid rgba(148, 163, 184, 0.25);
         background: rgba(2, 6, 23, 0.45);
         box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+        overflow: hidden; /* helps the overlay match rounded corners */
       }
 
       .rsvp-btn {
@@ -76,20 +77,136 @@
         user-select: none;
         cursor: pointer;
         box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        z-index: 20;
       }
       .rsvp-btn:hover { border-color: rgba(226, 232, 240, 0.6); }
       .rsvp-btn:focus { outline: 2px solid rgba(125, 211, 252, 0.7); outline-offset: 3px; }
+
+      /* Story overlay (covers the maze completely until Enter) */
+      .story-overlay{
+        position:absolute;
+        inset:0; /* covers the entire stage (including padding) */
+        border-radius: 14px;
+        display:none;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        padding:22px;
+        box-sizing:border-box;
+        z-index:40;
+        background: rgba(2, 6, 23, 0.94);
+        border: 2px solid rgba(148, 163, 184, 0.18);
+        backdrop-filter: blur(2px);
+      }
+
+      .story-title{
+        font: 18px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+      }
+
+      .story-row{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:16px;
+        margin: 10px 0 14px;
+      }
+
+      .pixel-svg{
+        width:72px;
+        height:72px;
+        image-rendering: pixelated;
+      }
+
+      .floaty{ animation: floaty 1.6s ease-in-out infinite; }
+      .pulse{ animation: pulse 1.2s ease-in-out infinite; }
+
+      @keyframes floaty{
+        0%,100%{ transform: translateY(0); }
+        50%{ transform: translateY(-6px); }
+      }
+      @keyframes pulse{
+        0%,100%{ transform: scale(1); }
+        50%{ transform: scale(1.06); }
+      }
+
+      .story-text{
+        font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        color: rgba(226,232,240,.92);
+        max-width: 560px;
+        margin: 0 auto 12px;
+      }
+
+      .story-hint{
+        font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        color: rgba(148,163,184,.95);
+      }
     </style>
   </head>
   <body>
     <div id="wrap">
-
-      <!-- NEW: Title above the maze -->
       <div id="gameBlock">
         <div id="titleBar" class="title-bar">Wedding Maze — Press Enter</div>
 
         <div id="stage">
           <canvas id="game" aria-label="Wedding Maze"></canvas>
+
+          <!-- STORY OVERLAY (covers the maze until Enter/click) -->
+          <div id="storyOverlay" class="story-overlay" aria-hidden="true">
+            <div>
+              <div class="story-title">Prologue</div>
+
+              <div class="story-row">
+                <!-- 8-bit groom (tux) -->
+                <svg class="pixel-svg floaty" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                  <!-- hair -->
+                  <rect x="5" y="2" width="6" height="2" fill="#1f2937"/>
+                  <rect x="4" y="3" width="1" height="2" fill="#1f2937"/>
+                  <rect x="11" y="3" width="1" height="2" fill="#1f2937"/>
+                  <!-- face -->
+                  <rect x="5" y="4" width="6" height="4" fill="#f1c27d"/>
+                  <!-- eyes -->
+                  <rect x="6" y="5" width="1" height="1" fill="#0b0f14"/>
+                  <rect x="9" y="5" width="1" height="1" fill="#0b0f14"/>
+                  <!-- tux jacket -->
+                  <rect x="4" y="8" width="8" height="6" fill="#0b0f14"/>
+                  <!-- shirt -->
+                  <rect x="7" y="8" width="2" height="6" fill="#e2e8f0"/>
+                  <!-- tie -->
+                  <rect x="7" y="9" width="2" height="1" fill="#38bdf8"/>
+                  <!-- legs -->
+                  <rect x="5" y="14" width="3" height="2" fill="#111827"/>
+                  <rect x="8" y="14" width="3" height="2" fill="#111827"/>
+                </svg>
+
+                <!-- 8-bit ring -->
+                <svg class="pixel-svg pulse" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                  <!-- ring band -->
+                  <rect x="6" y="5" width="4" height="1" fill="#fbbf24"/>
+                  <rect x="5" y="6" width="1" height="5" fill="#fbbf24"/>
+                  <rect x="10" y="6" width="1" height="5" fill="#fbbf24"/>
+                  <rect x="6" y="11" width="4" height="1" fill="#fbbf24"/>
+                  <!-- inner hole -->
+                  <rect x="6" y="6" width="4" height="5" fill="#0b0f14" opacity="0.55"/>
+                  <!-- gem -->
+                  <rect x="7" y="3" width="2" height="2" fill="#a78bfa"/>
+                  <rect x="7" y="3" width="2" height="1" fill="#ddd6fe" opacity="0.9"/>
+                </svg>
+              </div>
+
+              <div class="story-text">
+                Oh no — the groom forgot the ring back at the hotel.<br />
+                Help him get to the venue in time before the wedding gets cancelled!
+              </div>
+
+              <div class="story-hint">
+                Press <strong>Enter</strong> to start • Click/tap anywhere • Arrow keys / WASD to move • R to restart
+              </div>
+            </div>
+          </div>
+
           <!-- Goes to rsvp.html (same tab) -->
           <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html">RSVP</a>
         </div>
@@ -110,9 +227,6 @@
       </noscript>
 
       <script>
-        // Self-contained Canvas mini-game (no external dependencies)
-        // Standard tile scale, simple castle palette.
-
         const errEl = document.getElementById("err");
         function showErr(e) {
           errEl.style.display = "block";
@@ -126,16 +240,14 @@
           const ctx = canvas.getContext("2d", { alpha: false });
           ctx.imageSmoothingEnabled = false;
 
-          // NEW: external title element above canvas
           const titleBar = document.getElementById("titleBar");
-
           const rsvpBtn = document.getElementById("rsvpBtn");
           const RSVP_URL = "./rsvp.html";
-
-          // Ensure link is correct even if you change the HTML later
           rsvpBtn.href = RSVP_URL;
 
-          // --- Gameplay knobs (classic scale) ---
+          const storyOverlay = document.getElementById("storyOverlay");
+
+          // --- Gameplay knobs ---
           const TILE = 16;
           const SPEED = 140;
           const PLAYER_PAD = 4;
@@ -172,10 +284,9 @@
           function resize() {
             const pad = 24;
             const maxW = Math.max(320, window.innerWidth - pad);
-            const maxH = Math.max(240, window.innerHeight - 110);
+            const maxH = Math.max(240, window.innerHeight - 140); // slightly more room for title + HUD
             const MAX_SCALE = 3;
             const scale = Math.max(1, Math.min(MAX_SCALE, Math.floor(Math.min(maxW / W, maxH / H))));
-
             canvas.style.width = (W * scale) + "px";
             canvas.style.height = (H * scale) + "px";
           }
@@ -187,6 +298,7 @@
             return MAP[ty][tx] === "=";
           }
 
+          // Find start/goal
           let start = { x: 1, y: 1 };
           let goal = { x: COLS - 2, y: ROWS - 2 };
           for (let y = 0; y < ROWS; y++) {
@@ -198,7 +310,7 @@
           }
 
           const state = {
-            screen: "start", // start | play | win
+            screen: "story", // story | play | win
             groom: {
               x: start.x * TILE + PLAYER_PAD,
               y: start.y * TILE + PLAYER_PAD,
@@ -208,18 +320,37 @@
             },
           };
 
+          function syncStoryOverlay() {
+            const show = state.screen === "story";
+            storyOverlay.style.display = show ? "flex" : "none";
+            storyOverlay.setAttribute("aria-hidden", show ? "false" : "true");
+          }
+          syncStoryOverlay();
+
+          // click/tap anywhere on overlay to start
+          storyOverlay.addEventListener("click", () => {
+            if (state.screen === "story") {
+              state.screen = "play";
+              syncStoryOverlay();
+            }
+          });
+
           const keys = new Set();
           window.addEventListener("keydown", (e) => {
             keys.add(e.key.toLowerCase());
             if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
 
             if (e.key === "Enter") {
-              if (state.screen === "start") state.screen = "play";
+              if (state.screen === "story") {
+                state.screen = "play";
+                syncStoryOverlay();
+                return;
+              }
               if (state.screen === "win") reset();
             }
+
             if (e.key.toLowerCase() === "r") reset();
 
-            // Win-screen shortcut: V -> RSVP page (same tab)
             if (state.screen === "win" && e.key.toLowerCase() === "v") {
               window.location.href = RSVP_URL;
             }
@@ -230,6 +361,7 @@
             state.screen = "play";
             state.groom.x = start.x * TILE + PLAYER_PAD;
             state.groom.y = start.y * TILE + PLAYER_PAD;
+            syncStoryOverlay();
           }
 
           function rectsOverlap(a, b) {
@@ -252,7 +384,6 @@
               const ty = Math.floor(c.y / TILE);
               if (isWall(tx, ty)) return;
             }
-
             g.x = next.x;
             g.y = next.y;
           }
@@ -397,8 +528,11 @@
             drawBride();
             drawGroom();
 
-            // NEW: Update label ABOVE the maze (not on the canvas)
-            const label = (state.screen === "start") ? "Wedding Maze — Press Enter" : "Find the bride";
+            // Update title ABOVE the maze
+            const label =
+              (state.screen === "story")
+                ? "Wedding Maze — Press Enter"
+                : "Find the bride";
             titleBar.textContent = (state.screen === "win") ? "YOU MADE IT!" : label;
 
             if (state.screen !== "win") {
@@ -409,6 +543,9 @@
             }
 
             drawFrame();
+
+            // Ensure overlay visibility tracks state (defensive)
+            syncStoryOverlay();
           }
 
           let last = performance.now();
