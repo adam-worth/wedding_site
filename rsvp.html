@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RSVP</title>
+    <style>
+      html, body { height: 100%; margin: 0; background: #0b0f14; color: #e2e8f0; }
+      .wrap { max-width: 720px; margin: 0 auto; padding: 24px; font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+
+      .card {
+        border: 2px solid rgba(148,163,184,.25);
+        border-radius: 14px;
+        padding: 18px;
+        background: rgba(2,6,23,.55);
+        box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      }
+
+      /* Header image block */
+      .header {
+        padding: 0;
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+      .header img {
+        display: block;
+        width: 100%;
+        height: auto;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+
+      label { display:block; margin: 12px 0 6px; color: #cbd5e1; }
+      input, select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid rgba(148,163,184,.25); background: rgba(2,6,23,.65); color: #e2e8f0; }
+      button { margin-top: 16px; width: 100%; padding: 12px; border-radius: 12px; border: 2px solid rgba(226,232,240,.35); background: rgba(2,6,23,.85); color: #e2e8f0; cursor: pointer; text-transform: uppercase; letter-spacing: .04em; }
+      button:hover { border-color: rgba(226,232,240,.6); }
+      .small { color:#94a3b8; font-size: 12px; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <!-- Pixel header image (put rsvp_header.png in the same folder as this HTML file) -->
+      <div class="card header">
+        <img src="./rsvp_header.jpg" alt="Dora and Jordan — Wedding RSVP" />
+      </div>
+
+      <div class="card">
+        <h1 style="margin:0 0 6px;">RSVP</h1>
+        <div class="small">August 15 • Festetics Palace • Budapest 🏰</div>
+
+        <!-- Easiest: Formspree endpoint (replace ACTION URL) -->
+        <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <label for="name">Name</label>
+          <input id="name" name="name" autocomplete="name" required />
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+
+          <label for="guests">Number of guests</label>
+          <select id="guests" name="guests" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+
+          <button type="submit">Submit RSVP</button>
+        </form>
+
+        <div class="small">
+          After you create your Formspree form, replace <code>YOUR_FORM_ID</code> above.
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

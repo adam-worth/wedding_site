@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wedding Maze</title>
+    <style>
+      :root { --bg: #2F455A; --fg: #e2e8f0; --muted: #94a3b8; }
+      html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); }
+      body { display: grid; place-items: center; }
+      #wrap { width: min(980px, 100vw); padding: 12px; box-sizing: border-box; }
+      canvas { display: block; margin: 0 auto; background: #060a10; image-rendering: pixelated; image-rendering: crisp-edges; }
+      .hud {
+        margin-top: 10px;
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        color: var(--muted);
+      }
+      .panel {
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 10px;
+        padding: 10px;
+        background: rgba(2, 6, 23, 0.65);
+      }
+      #err { display: none; margin-top: 10px; white-space: pre-wrap; }
+      noscript { display: block; margin-top: 10px; }
+      a { color: #7dd3fc; }
+
+      #stage {
+        position: relative;
+        display: inline-block;
+        padding: 10px;
+        border-radius: 14px;
+        border: 2px solid rgba(148, 163, 184, 0.25);
+        background: rgba(2, 6, 23, 0.45);
+        box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      }
+
+      .rsvp-btn {
+        position: absolute;
+        left: 50%;
+        top: auto;
+        bottom: 20px;
+        transform: translate(-50%, 0);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 10px;
+        border: 2px solid rgba(226, 232, 240, 0.35);
+        background: rgba(2, 6, 23, 0.88);
+        color: var(--fg);
+        text-decoration: none;
+        font: 13px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        user-select: none;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      }
+      .rsvp-btn:hover { border-color: rgba(226, 232, 240, 0.6); }
+      .rsvp-btn:focus { outline: 2px solid rgba(125, 211, 252, 0.7); outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="stage">
+        <canvas id="game" aria-label="Wedding Maze"></canvas>
+        <!-- Goes to rsvp.html (same tab) -->
+        <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html">RSVP</a>
+      </div>
+
+      <div class="hud">
+        <div class="panel">Controls: Arrow keys / WASD • Enter to start • R to restart</div>
+        <div class="panel">Goal: Get the groom to the bride</div>
+      </div>
+
+      <div id="err" class="panel"></div>
+
+      <noscript>
+        <div class="panel">
+          This mini-game requires JavaScript. If you’re viewing this in a restricted preview that disables scripts,
+          open the file in a normal browser (or run a local server).
+        </div>
+      </noscript>
+
+      <script>
+        // Self-contained Canvas mini-game (no external dependencies)
+        // Standard tile scale, simple castle palette.
+
+        const errEl = document.getElementById("err");
+        function showErr(e) {
+          errEl.style.display = "block";
+          errEl.textContent = String(e?.stack || e?.message || e);
+        }
+        window.addEventListener("error", (e) => showErr(e.error || e.message || e));
+        window.addEventListener("unhandledrejection", (e) => showErr(e.reason || e));
+
+        try {
+          const canvas = document.getElementById("game");
+          const ctx = canvas.getContext("2d", { alpha: false });
+          ctx.imageSmoothingEnabled = false;
+
+          const rsvpBtn = document.getElementById("rsvpBtn");
+          const RSVP_URL = "./rsvp.html";
+
+          // Ensure link is correct even if you change the HTML later
+          rsvpBtn.href = RSVP_URL;
+
+          // --- Gameplay knobs (classic scale) ---
+          const TILE = 16;
+          const SPEED = 140;
+          const PLAYER_PAD = 4;
+          const GOAL_PAD = 4;
+          const FLOOR_DOT_SIZE = 2;
+
+          // Legend:
+          // '=' wall
+          // '.' floor
+          // 'g' groom start
+          // 'b' bride goal
+          const MAP = [
+            "======================",
+            "=g...................=",
+            "=.==================.=",
+            "=.=...............=..=",
+            "=.=.=============.=.==",
+            "=.=.=...........=.=..=",
+            "=.=.=.=========.=.====",
+            "=...=.....=.....=....=",
+            "=====.===.=.===.====.=",
+            "=........=.....=..b..=",
+            "======================",
+          ];
+
+          const COLS = MAP[0].length;
+          const ROWS = MAP.length;
+          const W = COLS * TILE;
+          const H = ROWS * TILE;
+
+          canvas.width = W;
+          canvas.height = H;
+
+          function resize() {
+            const pad = 24;
+            const maxW = Math.max(320, window.innerWidth - pad);
+            const maxH = Math.max(240, window.innerHeight - 110);
+            const scale = Math.max(1, Math.floor(Math.min(maxW / W, maxH / H)));
+            canvas.style.width = (W * scale) + "px";
+            canvas.style.height = (H * scale) + "px";
+          }
+          window.addEventListener("resize", resize);
+          resize();
+
+          function isWall(tx, ty) {
+            if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return true;
+            return MAP[ty][tx] === "=";
+          }
+
+          let start = { x: 1, y: 1 };
+          let goal = { x: COLS - 2, y: ROWS - 2 };
+          for (let y = 0; y < ROWS; y++) {
+            for (let x = 0; x < COLS; x++) {
+              const ch = MAP[y][x];
+              if (ch === "g") start = { x, y };
+              if (ch === "b") goal = { x, y };
+            }
+          }
+
+          const state = {
+            screen: "start", // start | play | win
+            groom: {
+              x: start.x * TILE + PLAYER_PAD,
+              y: start.y * TILE + PLAYER_PAD,
+              w: TILE - PLAYER_PAD * 2,
+              h: TILE - PLAYER_PAD * 2,
+              speed: SPEED,
+            },
+          };
+
+          const keys = new Set();
+          window.addEventListener("keydown", (e) => {
+            keys.add(e.key.toLowerCase());
+            if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
+
+            if (e.key === "Enter") {
+              if (state.screen === "start") state.screen = "play";
+              if (state.screen === "win") reset();
+            }
+            if (e.key.toLowerCase() === "r") reset();
+
+            // Win-screen shortcut: V -> RSVP page (same tab)
+            if (state.screen === "win" && e.key.toLowerCase() === "v") {
+              window.location.href = RSVP_URL;
+            }
+          });
+          window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
+
+          function reset() {
+            state.screen = "play";
+            state.groom.x = start.x * TILE + PLAYER_PAD;
+            state.groom.y = start.y * TILE + PLAYER_PAD;
+          }
+
+          function rectsOverlap(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+          }
+
+          function tryMove(dx, dy) {
+            const g = state.groom;
+            const next = { x: g.x + dx, y: g.y + dy, w: g.w, h: g.h };
+
+            const eps = 0.01;
+            const corners = [
+              { x: next.x, y: next.y },
+              { x: next.x + next.w - eps, y: next.y },
+              { x: next.x, y: next.y + next.h - eps },
+              { x: next.x + next.w - eps, y: next.y + next.h - eps },
+            ];
+            for (const c of corners) {
+              const tx = Math.floor(c.x / TILE);
+              const ty = Math.floor(c.y / TILE);
+              if (isWall(tx, ty)) return;
+            }
+
+            g.x = next.x;
+            g.y = next.y;
+          }
+
+          function update(dt) {
+            if (state.screen !== "play") return;
+
+            let dx = 0;
+            let dy = 0;
+            if (keys.has("arrowleft") || keys.has("a")) dx -= 1;
+            if (keys.has("arrowright") || keys.has("d")) dx += 1;
+            if (keys.has("arrowup") || keys.has("w")) dy -= 1;
+            if (keys.has("arrowdown") || keys.has("s")) dy += 1;
+
+            if (dx !== 0 && dy !== 0) {
+              const inv = 1 / Math.sqrt(2);
+              dx *= inv;
+              dy *= inv;
+            }
+
+            const speed = state.groom.speed;
+            if (dx !== 0) tryMove(dx * speed * dt, 0);
+            if (dy !== 0) tryMove(0, dy * speed * dt);
+
+            const bride = {
+              x: goal.x * TILE + GOAL_PAD,
+              y: goal.y * TILE + GOAL_PAD,
+              w: TILE - GOAL_PAD * 2,
+              h: TILE - GOAL_PAD * 2,
+            };
+            if (rectsOverlap(state.groom, bride)) state.screen = "win";
+          }
+
+          function drawWallTile(x0, y0, tx, ty) {
+            const alt = ((tx + ty) % 2) === 0;
+            ctx.fillStyle = alt ? "#26313c" : "#2a3744";
+            ctx.fillRect(x0, y0, TILE, TILE);
+
+            ctx.fillStyle = "#141a22";
+            ctx.fillRect(x0, y0 + Math.floor(TILE / 2), TILE, 1);
+            const rowOffset = (ty % 2) ? Math.floor(TILE / 2) : 0;
+            ctx.fillRect(x0 + rowOffset, y0, 1, TILE);
+            ctx.fillRect(x0 + rowOffset + Math.floor(TILE / 2), y0, 1, TILE);
+
+            ctx.strokeStyle = "rgba(2, 6, 23, 0.45)";
+            ctx.strokeRect(x0 + 0.5, y0 + 0.5, TILE - 1, TILE - 1);
+          }
+
+          function drawFloorTile(x0, y0) {
+            ctx.fillStyle = "#F2F1DB";
+            ctx.fillRect(x0, y0, TILE, TILE);
+
+            const s = Math.max(1, Math.min(4, FLOOR_DOT_SIZE));
+            const cx = x0 + Math.floor(TILE / 2);
+            const cy = y0 + Math.floor(TILE / 2);
+            ctx.fillStyle = "rgba(148, 163, 184, 0.28)";
+            ctx.fillRect(cx - Math.floor(s / 2), cy - Math.floor(s / 2), s, s);
+          }
+
+          function drawGroom() {
+            const g = state.groom;
+            const x = Math.round(g.x);
+            const y = Math.round(g.y);
+            const w = Math.round(g.w);
+            const h = Math.round(g.h);
+
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = "#0c4a6e";
+            ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+          }
+
+          function drawBride() {
+            const bx = Math.round(goal.x * TILE + GOAL_PAD);
+            const by = Math.round(goal.y * TILE + GOAL_PAD);
+            const bw = Math.round(TILE - GOAL_PAD * 2);
+            const bh = Math.round(TILE - GOAL_PAD * 2);
+
+            ctx.fillStyle = "#f472b6";
+            ctx.fillRect(bx, by, bw, bh);
+            ctx.strokeStyle = "#831843";
+            ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+
+            ctx.fillStyle = "#fde68a";
+            ctx.fillRect(bx + Math.floor(bw / 2) - 2, by - 1, 1, 1);
+            ctx.fillRect(bx + Math.floor(bw / 2) + 1, by - 1, 1, 1);
+          }
+
+          function drawFrame() {
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.18)";
+            ctx.strokeRect(1, 1, W - 2, H - 2);
+            ctx.strokeStyle = "rgba(2, 6, 23, 0.55)";
+            ctx.strokeRect(3, 3, W - 6, H - 6);
+          }
+
+          function drawTopBar() {
+            const m = 10;
+            const barH = 24;
+
+            ctx.fillStyle = "rgba(2, 6, 23, 0.78)";
+            ctx.fillRect(m, m, W - m * 2, barH);
+
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.18)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(m + 0.5, m + 0.5, W - m * 2 - 1, barH - 1);
+
+            ctx.fillStyle = "#e2e8f0";
+            ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+
+            const label = (state.screen === "start") ? "Wedding Maze — Press Enter" : "Find the bride";
+            ctx.fillText(label, m + 10, m + 16);
+          }
+
+          function drawWinModal() {
+            ctx.fillStyle = "rgba(2, 6, 23, 0.86)";
+            ctx.fillRect(0, 0, W, H);
+
+            const pad = 12;
+            const boxX = pad;
+            const boxY = pad;
+            const boxW = W - pad * 2;
+            const boxH = H - pad * 2;
+
+            ctx.fillStyle = "#0b1220";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX + 1, boxY + 1, boxW - 2, boxH - 2);
+
+            ctx.fillStyle = "#e2e8f0";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = "16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+            ctx.fillText("YOU MADE IT!", boxX + boxW / 2, boxY + 28);
+
+            ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+            const lines = ["AUGUST 15", "FESTETICS PALACE", "BUDAPEST, HUNGARY  🏰"];
+            const startY = boxY + 70;
+            const lineH = 18;
+            for (let i = 0; i < lines.length; i++) {
+              ctx.fillText(lines[i], boxX + boxW / 2, startY + i * lineH);
+            }
+          }
+
+          function draw() {
+            ctx.fillStyle = "#060a10";
+            ctx.fillRect(0, 0, W, H);
+
+            for (let y = 0; y < ROWS; y++) {
+              for (let x = 0; x < COLS; x++) {
+                const ch = MAP[y][x];
+                const x0 = x * TILE;
+                const y0 = y * TILE;
+                if (ch === "=") drawWallTile(x0, y0, x, y);
+                else drawFloorTile(x0, y0);
+              }
+            }
+
+            drawBride();
+            drawGroom();
+
+            if (state.screen !== "win") {
+              drawTopBar();
+              rsvpBtn.style.display = "none";
+            } else {
+              drawWinModal();
+              rsvpBtn.style.display = "inline-flex";
+            }
+
+            drawFrame();
+          }
+
+          let last = performance.now();
+          function loop(now) {
+            const dt = Math.min(0.05, (now - last) / 1000);
+            last = now;
+            update(dt);
+            draw();
+            requestAnimationFrame(loop);
+          }
+
+          draw();
+          requestAnimationFrame(loop);
+        } catch (e) {
+          showErr(e);
+        }
+      </script>
+    </div>
+  </body>
+</html>
+
