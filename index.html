@@ -10,6 +10,7 @@
       body { display: grid; place-items: center; }
       #wrap { width: min(980px, 100vw); padding: 12px; box-sizing: border-box; }
       canvas { display: block; margin: 0 auto; background: #060a10; image-rendering: pixelated; image-rendering: crisp-edges; }
+
       .hud {
         margin-top: 10px;
         display: flex;
@@ -28,6 +29,20 @@
       #err { display: none; margin-top: 10px; white-space: pre-wrap; }
       noscript { display: block; margin-top: 10px; }
       a { color: #7dd3fc; }
+
+      /* NEW: label above the maze (outside the canvas) */
+      #gameBlock { display: inline-block; width: fit-content; max-width: 100%; }
+      .title-bar {
+        margin: 0 0 10px;
+        padding: 10px 12px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 10px;
+        background: rgba(2, 6, 23, 0.65);
+        color: var(--fg);
+        text-align: center;
+        font: 16px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing: 0.04em;
+      }
 
       #stage {
         position: relative;
@@ -68,10 +83,16 @@
   </head>
   <body>
     <div id="wrap">
-      <div id="stage">
-        <canvas id="game" aria-label="Wedding Maze"></canvas>
-        <!-- Goes to rsvp.html (same tab) -->
-        <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html">RSVP</a>
+
+      <!-- NEW: Title above the maze -->
+      <div id="gameBlock">
+        <div id="titleBar" class="title-bar">Wedding Maze — Press Enter</div>
+
+        <div id="stage">
+          <canvas id="game" aria-label="Wedding Maze"></canvas>
+          <!-- Goes to rsvp.html (same tab) -->
+          <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html">RSVP</a>
+        </div>
       </div>
 
       <div class="hud">
@@ -104,6 +125,9 @@
           const canvas = document.getElementById("game");
           const ctx = canvas.getContext("2d", { alpha: false });
           ctx.imageSmoothingEnabled = false;
+
+          // NEW: external title element above canvas
+          const titleBar = document.getElementById("titleBar");
 
           const rsvpBtn = document.getElementById("rsvpBtn");
           const RSVP_URL = "./rsvp.html";
@@ -325,26 +349,6 @@
             ctx.strokeRect(3, 3, W - 6, H - 6);
           }
 
-          function drawTopBar() {
-            const m = 10;
-            const barH = 24;
-
-            ctx.fillStyle = "rgba(2, 6, 23, 0.78)";
-            ctx.fillRect(m, m, W - m * 2, barH);
-
-            ctx.strokeStyle = "rgba(148, 163, 184, 0.18)";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(m + 0.5, m + 0.5, W - m * 2 - 1, barH - 1);
-
-            ctx.fillStyle = "#e2e8f0";
-            ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
-            ctx.textAlign = "left";
-            ctx.textBaseline = "alphabetic";
-
-            const label = (state.screen === "start") ? "Wedding Maze — Press Enter" : "Find the bride";
-            ctx.fillText(label, m + 10, m + 16);
-          }
-
           function drawWinModal() {
             ctx.fillStyle = "rgba(2, 6, 23, 0.86)";
             ctx.fillRect(0, 0, W, H);
@@ -393,8 +397,11 @@
             drawBride();
             drawGroom();
 
+            // NEW: Update label ABOVE the maze (not on the canvas)
+            const label = (state.screen === "start") ? "Wedding Maze — Press Enter" : "Find the bride";
+            titleBar.textContent = (state.screen === "win") ? "YOU MADE IT!" : label;
+
             if (state.screen !== "win") {
-              drawTopBar();
               rsvpBtn.style.display = "none";
             } else {
               drawWinModal();
