@@ -65,13 +65,13 @@
         <div class="small">August 15 • Festetics Palace • Budapest, Hungary 🏰</div>
 
         <form action="https://formspree.io/f/mblnwpqo" method="POST">
-          <label for="name">Your name</label>
+          <label for="name">Name</label>
           <input id="name" name="name" autocomplete="name" required />
 
           <label for="email">Email</label>
           <input id="email" name="email" type="email" autocomplete="email" required />
 
-          <label for="guests">Number of guests (including you)</label>
+          <label for="guests">Number of guests</label>
           <select id="guests" name="guests" required>
             <option value="" selected disabled>Select one…</option>
             <option value="1">1</option>
@@ -80,12 +80,12 @@
             <option value="4">4</option>
           </select>
 
-          <label for="guest_names">Guest names</label>
-          <textarea
-            id="guest_names"
-            name="guest_names"
-            placeholder="Please list the full names of everyone attending (including you), one per line."
-          ></textarea>
+          <label for="hotel">Interested in hotel accommodation?</label>
+          <select id="hotel" name="hotel_accommodation_interest" required>
+            <option value="" selected disabled>Select one…</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
 
           <label for="diet">Food allergies or dietary preferences</label>
           <textarea
@@ -93,13 +93,6 @@
             name="food_allergies_preferences"
             placeholder="e.g., vegetarian, vegan, gluten-free, nut allergy, etc."
           ></textarea>
-
-          <label for="hotel">Interested in hotel accommodation?</label>
-          <select id="hotel" name="hotel_accommodation_interest" required>
-            <option value="" selected disabled>Select one…</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
 
           <label for="song">One must-play wedding song</label>
           <input

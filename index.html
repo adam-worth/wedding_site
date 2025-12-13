@@ -8,16 +8,8 @@
       :root { --bg: #2F455A; --fg: #e2e8f0; --muted: #94a3b8; }
       html, body { height: 100%; margin: 0; background: var(--bg); color: var(--fg); }
       body { display: grid; place-items: center; }
-
       #wrap { width: min(980px, 100vw); padding: 12px; box-sizing: border-box; }
-
-      canvas {
-        display: block;
-        margin: 0 auto;
-        background: #060a10;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
-      }
+      canvas { display: block; margin: 0 auto; background: #060a10; image-rendering: pixelated; image-rendering: crisp-edges; }
 
       .hud {
         margin-top: 10px;
@@ -34,20 +26,18 @@
         padding: 10px;
         background: rgba(2, 6, 23, 0.65);
       }
-
       #err { display: none; margin-top: 10px; white-space: pre-wrap; }
       noscript { display: block; margin-top: 10px; }
       a { color: #7dd3fc; }
 
+      /* Label above the maze (outside the canvas) */
       #gameBlock { display: inline-block; width: fit-content; max-width: 100%; }
-
-      /* Title above the maze */
       .title-bar {
         margin: 0 0 10px;
         padding: 10px 12px;
         border: 1px solid rgba(148, 163, 184, 0.25);
         border-radius: 10px;
-        background: rgba(2, 6, 23, 0.55);
+        background: rgba(2, 6, 23, 0.65);
         color: var(--fg);
         text-align: center;
         font: 16px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -62,11 +52,13 @@
         border: 2px solid rgba(148, 163, 184, 0.25);
         background: rgba(2, 6, 23, 0.45);
         box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+        overflow: hidden; /* helps the overlay match rounded corners */
       }
 
       .rsvp-btn {
         position: absolute;
         left: 50%;
+        top: auto;
         bottom: 20px;
         transform: translate(-50%, 0);
         display: none;
@@ -85,34 +77,152 @@
         user-select: none;
         cursor: pointer;
         box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-        z-index: 5;
+        z-index: 20;
       }
       .rsvp-btn:hover { border-color: rgba(226, 232, 240, 0.6); }
       .rsvp-btn:focus { outline: 2px solid rgba(125, 211, 252, 0.7); outline-offset: 3px; }
+
+      /* Story overlay (covers the maze completely until Enter) */
+      .story-overlay{
+        position:absolute;
+        inset:0; /* covers the entire stage (including padding) */
+        border-radius: 14px;
+        display:none;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        padding:22px;
+        box-sizing:border-box;
+        z-index:40;
+        background: rgba(2, 6, 23, 0.94);
+        border: 2px solid rgba(148, 163, 184, 0.18);
+        backdrop-filter: blur(2px);
+      }
+
+      .story-title{
+        font: 18px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+      }
+
+      .story-row{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:16px;
+        margin: 10px 0 14px;
+      }
+
+      .pixel-svg{
+        width:72px;
+        height:72px;
+        image-rendering: pixelated;
+      }
+
+      .floaty{ animation: floaty 1.6s ease-in-out infinite; }
+      .pulse{ animation: pulse 1.2s ease-in-out infinite; }
+
+      @keyframes floaty{
+        0%,100%{ transform: translateY(0); }
+        50%{ transform: translateY(-6px); }
+      }
+      @keyframes pulse{
+        0%,100%{ transform: scale(1); }
+        50%{ transform: scale(1.06); }
+      }
+
+      .story-text{
+        font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        color: rgba(226,232,240,.92);
+        max-width: 560px;
+        margin: 0 auto 12px;
+      }
+
+      .story-hint{
+        font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        color: rgba(148,163,184,.95);
+      }
     </style>
   </head>
   <body>
     <div id="wrap">
       <div id="gameBlock">
-        <!-- IMPORTANT: this element must exist (your error came from it being missing) -->
-        <div id="titleBar" class="title-bar">The Ring Quest — Press Enter</div>
+        <div id="titleBar" class="title-bar">Wedding Maze — Press Enter</div>
 
         <div id="stage">
           <canvas id="game" aria-label="Wedding Maze"></canvas>
+
+          <!-- STORY OVERLAY (covers the maze until Enter/click) -->
+          <div id="storyOverlay" class="story-overlay" aria-hidden="true">
+            <div>
+              <div class="story-title">Prologue</div>
+
+              <div class="story-row">
+                <!-- 8-bit groom (tux) -->
+                <svg class="pixel-svg floaty" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                  <!-- hair -->
+                  <rect x="5" y="2" width="6" height="2" fill="#1f2937"/>
+                  <rect x="4" y="3" width="1" height="2" fill="#1f2937"/>
+                  <rect x="11" y="3" width="1" height="2" fill="#1f2937"/>
+                  <!-- face -->
+                  <rect x="5" y="4" width="6" height="4" fill="#f1c27d"/>
+                  <!-- eyes -->
+                  <rect x="6" y="5" width="1" height="1" fill="#0b0f14"/>
+                  <rect x="9" y="5" width="1" height="1" fill="#0b0f14"/>
+                  <!-- tux jacket -->
+                  <rect x="4" y="8" width="8" height="6" fill="#0b0f14"/>
+                  <!-- shirt -->
+                  <rect x="7" y="8" width="2" height="6" fill="#e2e8f0"/>
+                  <!-- tie -->
+                  <rect x="7" y="9" width="2" height="1" fill="#38bdf8"/>
+                  <!-- legs -->
+                  <rect x="5" y="14" width="3" height="2" fill="#111827"/>
+                  <rect x="8" y="14" width="3" height="2" fill="#111827"/>
+                </svg>
+
+                <!-- 8-bit ring -->
+                <svg class="pixel-svg pulse" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                  <!-- ring band -->
+                  <rect x="6" y="5" width="4" height="1" fill="#fbbf24"/>
+                  <rect x="5" y="6" width="1" height="5" fill="#fbbf24"/>
+                  <rect x="10" y="6" width="1" height="5" fill="#fbbf24"/>
+                  <rect x="6" y="11" width="4" height="1" fill="#fbbf24"/>
+                  <!-- inner hole -->
+                  <rect x="6" y="6" width="4" height="5" fill="#0b0f14" opacity="0.55"/>
+                  <!-- gem -->
+                  <rect x="7" y="3" width="2" height="2" fill="#a78bfa"/>
+                  <rect x="7" y="3" width="2" height="1" fill="#ddd6fe" opacity="0.9"/>
+                </svg>
+              </div>
+
+              <div class="story-text">
+                Oh no — the groom forgot the ring back at the hotel.<br />
+                Help him get to the venue in time before the wedding gets cancelled!
+              </div>
+
+              <div class="story-hint">
+                Press <strong>Enter</strong> to start • Click/tap anywhere • Arrow keys / WASD to move • R to restart
+              </div>
+            </div>
+          </div>
+
+          <!-- Goes to rsvp.html (same tab) -->
           <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html">RSVP</a>
         </div>
       </div>
 
       <div class="hud">
         <div class="panel">Controls: Arrow keys / WASD • Enter to start • R to restart</div>
-        <div class="panel">Goal: Get the groom to the castle</div>
+        <div class="panel">Goal: Get the groom to the bride</div>
       </div>
 
       <div id="err" class="panel"></div>
 
       <noscript>
         <div class="panel">
-          This mini-game requires JavaScript. Open the file in a normal browser (or run a local server).
+          This mini-game requires JavaScript. If you’re viewing this in a restricted preview that disables scripts,
+          open the file in a normal browser (or run a local server).
         </div>
       </noscript>
 
@@ -130,18 +240,25 @@
           const ctx = canvas.getContext("2d", { alpha: false });
           ctx.imageSmoothingEnabled = false;
 
-          const titleBar = document.getElementById("titleBar"); // must exist
+          const titleBar = document.getElementById("titleBar");
           const rsvpBtn = document.getElementById("rsvpBtn");
           const RSVP_URL = "./rsvp.html";
           rsvpBtn.href = RSVP_URL;
 
+          const storyOverlay = document.getElementById("storyOverlay");
+
+          // --- Gameplay knobs ---
           const TILE = 16;
           const SPEED = 140;
           const PLAYER_PAD = 4;
           const GOAL_PAD = 4;
           const FLOOR_DOT_SIZE = 2;
 
-          // '=' wall, '.' floor, 'g' start, 'b' goal
+          // Legend:
+          // '=' wall
+          // '.' floor
+          // 'g' groom start
+          // 'b' bride goal
           const MAP = [
             "======================",
             "=g...................=",
@@ -167,16 +284,9 @@
           function resize() {
             const pad = 24;
             const maxW = Math.max(320, window.innerWidth - pad);
-            const maxH = Math.max(240, window.innerHeight - 150);
-
-            // Smaller overall (reduce if it still feels huge)
-            const MAX_SCALE = 2;
-
-            const scale = Math.max(
-              1,
-              Math.min(MAX_SCALE, Math.floor(Math.min(maxW / W, maxH / H)))
-            );
-
+            const maxH = Math.max(240, window.innerHeight - 140); // slightly more room for title + HUD
+            const MAX_SCALE = 3;
+            const scale = Math.max(1, Math.min(MAX_SCALE, Math.floor(Math.min(maxW / W, maxH / H))));
             canvas.style.width = (W * scale) + "px";
             canvas.style.height = (H * scale) + "px";
           }
@@ -210,33 +320,48 @@
             },
           };
 
+          function syncStoryOverlay() {
+            const show = state.screen === "story";
+            storyOverlay.style.display = show ? "flex" : "none";
+            storyOverlay.setAttribute("aria-hidden", show ? "false" : "true");
+          }
+          syncStoryOverlay();
+
+          // click/tap anywhere on overlay to start
+          storyOverlay.addEventListener("click", () => {
+            if (state.screen === "story") {
+              state.screen = "play";
+              syncStoryOverlay();
+            }
+          });
+
           const keys = new Set();
           window.addEventListener("keydown", (e) => {
-            const k = e.key.toLowerCase();
-            keys.add(k);
+            keys.add(e.key.toLowerCase());
             if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
 
             if (e.key === "Enter") {
               if (state.screen === "story") {
                 state.screen = "play";
-              } else if (state.screen === "win") {
-                reset("story");
+                syncStoryOverlay();
+                return;
               }
+              if (state.screen === "win") reset();
             }
 
-            if (k === "r") reset("story");
+            if (e.key.toLowerCase() === "r") reset();
 
-            // Win shortcut
-            if (state.screen === "win" && k === "v") {
+            if (state.screen === "win" && e.key.toLowerCase() === "v") {
               window.location.href = RSVP_URL;
             }
           });
           window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
 
-          function reset(targetScreen = "play") {
-            state.screen = targetScreen;
+          function reset() {
+            state.screen = "play";
             state.groom.x = start.x * TILE + PLAYER_PAD;
             state.groom.y = start.y * TILE + PLAYER_PAD;
+            syncStoryOverlay();
           }
 
           function rectsOverlap(a, b) {
@@ -259,7 +384,6 @@
               const ty = Math.floor(c.y / TILE);
               if (isWall(tx, ty)) return;
             }
-
             g.x = next.x;
             g.y = next.y;
           }
@@ -267,7 +391,8 @@
           function update(dt) {
             if (state.screen !== "play") return;
 
-            let dx = 0, dy = 0;
+            let dx = 0;
+            let dy = 0;
             if (keys.has("arrowleft") || keys.has("a")) dx -= 1;
             if (keys.has("arrowright") || keys.has("d")) dx += 1;
             if (keys.has("arrowup") || keys.has("w")) dy -= 1;
@@ -275,21 +400,21 @@
 
             if (dx !== 0 && dy !== 0) {
               const inv = 1 / Math.sqrt(2);
-              dx *= inv; dy *= inv;
+              dx *= inv;
+              dy *= inv;
             }
 
             const speed = state.groom.speed;
             if (dx !== 0) tryMove(dx * speed * dt, 0);
             if (dy !== 0) tryMove(0, dy * speed * dt);
 
-            // Goal collision stays as a normal tile-rect (even though we draw an emoji)
-            const goalRect = {
+            const bride = {
               x: goal.x * TILE + GOAL_PAD,
               y: goal.y * TILE + GOAL_PAD,
               w: TILE - GOAL_PAD * 2,
               h: TILE - GOAL_PAD * 2,
             };
-            if (rectsOverlap(state.groom, goalRect)) state.screen = "win";
+            if (rectsOverlap(state.groom, bride)) state.screen = "win";
           }
 
           function drawWallTile(x0, y0, tx, ty) {
@@ -325,26 +450,26 @@
             const w = Math.round(g.w);
             const h = Math.round(g.h);
 
-            // Keep groom as BLUE DOT
             ctx.fillStyle = "#38bdf8";
             ctx.fillRect(x, y, w, h);
             ctx.strokeStyle = "#0c4a6e";
             ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
           }
 
-          // Goal: CASTLE EMOJI 🏰
-          function drawCastleGoal() {
-            const cx = goal.x * TILE + TILE / 2;
-            const cy = goal.y * TILE + TILE / 2 + 1;
+          function drawBride() {
+            const bx = Math.round(goal.x * TILE + GOAL_PAD);
+            const by = Math.round(goal.y * TILE + GOAL_PAD);
+            const bw = Math.round(TILE - GOAL_PAD * 2);
+            const bh = Math.round(TILE - GOAL_PAD * 2);
 
-            // Tiny backdrop so the emoji is readable on the path
-            ctx.fillStyle = "rgba(2, 6, 23, 0.20)";
-            ctx.fillRect(goal.x * TILE + 2, goal.y * TILE + 2, TILE - 4, TILE - 4);
+            ctx.fillStyle = "#f472b6";
+            ctx.fillRect(bx, by, bw, bh);
+            ctx.strokeStyle = "#831843";
+            ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
 
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.font = "18px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif";
-            ctx.fillText("🏰", cx, cy);
+            ctx.fillStyle = "#fde68a";
+            ctx.fillRect(bx + Math.floor(bw / 2) - 2, by - 1, 1, 1);
+            ctx.fillRect(bx + Math.floor(bw / 2) + 1, by - 1, 1, 1);
           }
 
           function drawFrame() {
@@ -355,116 +480,15 @@
             ctx.strokeRect(3, 3, W - 6, H - 6);
           }
 
-          // Simple pixel “tux groom” sprite for the story overlay (not the playable dot)
-          function drawPixelGroomSprite(px, py, s) {
-            const C = {
-              T: "#0b0f14",  // tux
-              W: "#e2e8f0",  // shirt
-              R: "#ef4444",  // tie
-              S: "#f2c9a0",  // skin
-              H: "#7a4a2b",  // brown hair
-              O: null,       // transparent
-            };
-
-            const sprite = [
-              "OOOOHHHHOOOO",
-              "OOOHHHHHHOOO",
-              "OOHHSSSHHSOO",
-              "OHHSSSSSSHHO",
-              "OHSSSSSSSSHO",
-              "OHSSSSSSSSHO",
-              "OHTTWWRWWTHO",
-              "OOTTTTTTTTOO",
-              "OOOTTTTTTOOO",
-              "OOOTTOOTTOOO",
-              "OOOTTOOTTOOO",
-              "OOOTT  TTOOO",
-            ];
-
-            for (let y = 0; y < sprite.length; y++) {
-              for (let x = 0; x < sprite[y].length; x++) {
-                const k = sprite[y][x];
-                const col = C[k];
-                if (!col) continue;
-                ctx.fillStyle = col;
-                ctx.fillRect(px + x * s, py + y * s, s, s);
-              }
-            }
-          }
-
-          function drawRingSprite(px, py, s) {
-            const C = {
-              G: "#facc15", // gold
-              D: "#e2e8f0", // diamond
-              O: null,
-            };
-            const ring = [
-              "OOOOODDOOO",
-              "OOO ODD OOO",
-              "OOOGGGGGOOO",
-              "OOGG O GGOO",
-              "OOGG O GGOO",
-              "OOOGGGGGOOO",
-              "OOOOOGOOOOO",
-            ].map(r => r.replace(/ /g, "O"));
-
-            for (let y = 0; y < ring.length; y++) {
-              for (let x = 0; x < ring[y].length; x++) {
-                const k = ring[y][x];
-                const col = C[k];
-                if (!col) continue;
-                ctx.fillStyle = col;
-                ctx.fillRect(px + x * s, py + y * s, s, s);
-              }
-            }
-          }
-
-          function drawStoryOverlay() {
-            // lighter overlay than before
-            ctx.fillStyle = "rgba(2, 6, 23, 0.60)";
-            ctx.fillRect(0, 0, W, H);
-
-            // Panel
-            const pad = 14;
-            ctx.fillStyle = "rgba(11, 18, 32, 0.92)";
-            ctx.fillRect(pad, pad, W - pad * 2, H - pad * 2);
-            ctx.strokeStyle = "rgba(148, 163, 184, 0.25)";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(pad + 1, pad + 1, W - pad * 2 - 2, H - pad * 2 - 2);
-
-            // Sprites
-            const s = 3; // sprite scale
-            drawPixelGroomSprite(pad + 26, pad + 26, s);
-            drawRingSprite(W - pad - 26 - 11 * s, pad + 30, s);
-
-            // Text
-            ctx.fillStyle = "#e2e8f0";
-            ctx.textAlign = "left";
-            ctx.textBaseline = "alphabetic";
-            ctx.font = "14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
-
-            const lines = [
-              "Oh no — the groom forgot the ring back at the hotel!",
-              "Help him get to the venue in time…",
-              "before Dora cancels the wedding.",
-              "",
-              "Press Enter to begin.",
-            ];
-
-            let tx = pad + 26;
-            let ty = pad + 26 + 14 * s + 28;
-            for (const line of lines) {
-              ctx.fillText(line, tx, ty);
-              ty += 18;
-            }
-          }
-
           function drawWinModal() {
-            ctx.fillStyle = "rgba(2, 6, 23, 0.78)";
+            ctx.fillStyle = "rgba(2, 6, 23, 0.86)";
             ctx.fillRect(0, 0, W, H);
 
             const pad = 12;
-            const boxX = pad, boxY = pad, boxW = W - pad * 2, boxH = H - pad * 2;
+            const boxX = pad;
+            const boxY = pad;
+            const boxW = W - pad * 2;
+            const boxH = H - pad * 2;
 
             ctx.fillStyle = "#0b1220";
             ctx.fillRect(boxX, boxY, boxW, boxH);
@@ -476,23 +500,21 @@
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.font = "16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
-            ctx.fillText("YOU MADE IT!", boxX + boxW / 2, boxY + 34);
+            ctx.fillText("YOU MADE IT!", boxX + boxW / 2, boxY + 28);
 
             ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
-            const lines = ["AUGUST 15", "FESTETICS PALACE", "BUDAPEST, HUNGARY  🏰", "", "Press V for RSVP"];
-            let y = boxY + 78;
-            for (const line of lines) {
-              ctx.fillText(line, boxX + boxW / 2, y);
-              y += 18;
+            const lines = ["AUGUST 15", "FESTETICS PALACE", "BUDAPEST, HUNGARY  🏰"];
+            const startY = boxY + 70;
+            const lineH = 18;
+            for (let i = 0; i < lines.length; i++) {
+              ctx.fillText(lines[i], boxX + boxW / 2, startY + i * lineH);
             }
           }
 
           function draw() {
-            // background
             ctx.fillStyle = "#060a10";
             ctx.fillRect(0, 0, W, H);
 
-            // tiles
             for (let y = 0; y < ROWS; y++) {
               for (let x = 0; x < COLS; x++) {
                 const ch = MAP[y][x];
@@ -503,25 +525,27 @@
               }
             }
 
-            // goal + player
-            drawCastleGoal();
+            drawBride();
             drawGroom();
 
-            // UI + overlays
-            if (state.screen === "story") {
-              if (titleBar) titleBar.textContent = "The Ring Quest — Press Enter";
+            // Update title ABOVE the maze
+            const label =
+              (state.screen === "story")
+                ? "Wedding Maze — Press Enter"
+                : "Find the bride";
+            titleBar.textContent = (state.screen === "win") ? "YOU MADE IT!" : label;
+
+            if (state.screen !== "win") {
               rsvpBtn.style.display = "none";
-              drawStoryOverlay(); // covers the maze completely
-            } else if (state.screen === "play") {
-              if (titleBar) titleBar.textContent = "Find the castle";
-              rsvpBtn.style.display = "none";
-            } else if (state.screen === "win") {
-              if (titleBar) titleBar.textContent = "YOU MADE IT!";
+            } else {
               drawWinModal();
               rsvpBtn.style.display = "inline-flex";
             }
 
             drawFrame();
+
+            // Ensure overlay visibility tracks state (defensive)
+            syncStoryOverlay();
           }
 
           let last = performance.now();
