@@ -55,26 +55,38 @@
       .small { color:#94a3b8; font-size: 12px; margin-top: 10px; }
 
       .section {
-        margin-top: 16px;
-        padding-top: 14px;
+        margin-top: 18px;
+        padding-top: 16px;
         border-top: 1px solid rgba(148,163,184,.18);
       }
       .section:first-of-type {
-        margin-top: 10px;
+        margin-top: 12px;
         padding-top: 0;
         border-top: 0;
       }
-      .section-title {
-        margin: 0 0 6px;
-        font-size: 13px;
-        letter-spacing: .08em;
+
+      /* More “header-like” section headings */
+      .section-head { margin: 0 0 10px; }
+      .section-header {
+        margin: 0;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(148,163,184,.28);
+        background: rgba(15, 23, 42, 0.70);
+        box-shadow: 0 10px 26px rgba(0,0,0,.35);
+        color: rgba(226,232,240,.95);
+        font-size: 14px;
+        letter-spacing: .14em;
         text-transform: uppercase;
-        color: rgba(226,232,240,.92);
       }
       .section-subtitle {
-        margin: 0 0 10px;
+        margin: 8px 2px 0;
         color: rgba(148,163,184,.95);
         font-size: 12px;
+      }
+
+      @media (max-width: 420px) {
+        .section-header { padding: 11px 12px; font-size: 13px; }
       }
     </style>
   </head>
@@ -100,8 +112,10 @@
 
           <!-- HUNGARY SECTION -->
           <div class="section" aria-label="Hungary RSVP section">
-            <div class="section-title" data-i18n="section_hungary_title">Hungary</div>
-            <div class="section-subtitle" data-i18n="section_hungary_subtitle">Budapest • Festetics Palace • August 15</div>
+            <div class="section-head">
+              <h2 class="section-header" data-i18n="section_hungary_title">Hungary</h2>
+              <div class="section-subtitle" data-i18n="section_hungary_subtitle">Budapest • Festetics Palace • August 15</div>
+            </div>
 
             <label for="hungary_attendance" data-i18n="label_hungary_attendance">Will you attend the wedding in Hungary?</label>
             <select id="hungary_attendance" name="hungary_attendance" required>
@@ -157,8 +171,10 @@
 
           <!-- WISCONSIN SECTION -->
           <div class="section" aria-label="Wisconsin RSVP section">
-            <div class="section-title" data-i18n="section_wisconsin_title">Wisconsin</div>
-            <div class="section-subtitle" data-i18n="section_wisconsin_subtitle">Party • Date TBD</div>
+            <div class="section-head">
+              <h2 class="section-header" data-i18n="section_wisconsin_title">Wisconsin</h2>
+              <div class="section-subtitle" data-i18n="section_wisconsin_subtitle">Party • Date TBD</div>
+            </div>
 
             <label for="wisconsin_attendance" data-i18n="label_wisconsin_attendance">Will you attend the Wisconsin party? (date TBD)</label>
             <select id="wisconsin_attendance" name="wisconsin_attendance" required>
@@ -187,7 +203,6 @@
               placeholder="Please list all attending guests (including yourself), one per line."
             ></textarea>
 
-            <!-- Same question set, even if hotel may not apply; keep for parity as requested -->
             <label for="wisconsin_hotel" data-i18n="label_hotel">Interested in hotel accommodation?</label>
             <select id="wisconsin_hotel" name="wisconsin_hotel_accommodation_interest" required>
               <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
