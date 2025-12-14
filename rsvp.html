@@ -27,6 +27,7 @@
 
       label { display:block; margin: 12px 0 6px; color: #cbd5e1; }
       input, select, textarea {
+        display: block;
         width: 100%;
         padding: 10px;
         border-radius: 10px;
@@ -52,6 +53,29 @@
       }
       button:hover { border-color: rgba(226,232,240,.6); }
       .small { color:#94a3b8; font-size: 12px; margin-top: 10px; }
+
+      .section {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(148,163,184,.18);
+      }
+      .section:first-of-type {
+        margin-top: 10px;
+        padding-top: 0;
+        border-top: 0;
+      }
+      .section-title {
+        margin: 0 0 6px;
+        font-size: 13px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: rgba(226,232,240,.92);
+      }
+      .section-subtitle {
+        margin: 0 0 10px;
+        color: rgba(148,163,184,.95);
+        font-size: 12px;
+      }
     </style>
   </head>
   <body>
@@ -67,100 +91,127 @@
         </div>
 
         <form action="https://formspree.io/f/mblnwpqo" method="POST">
-          <!-- Hungary attendance question near the top -->
-          <label for="hungary_attendance" data-i18n="label_hungary_attendance">
-            Will you attend the wedding in Hungary?
-          </label>
-          <select id="hungary_attendance" name="hungary_attendance" required>
-            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
-            <!-- keep values stable; only text is translated -->
-            <option value="Yes" data-i18n="opt_yes">Yes</option>
-            <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
-            <option value="No" data-i18n="opt_no">No</option>
-          </select>
-
+          <!-- Shared contact info once -->
           <label for="name" data-i18n="label_name">Name</label>
           <input id="name" name="name" autocomplete="name" required />
 
           <label for="email" data-i18n="label_email">Email</label>
           <input id="email" name="email" type="email" autocomplete="email" required />
 
-          
-          
+          <!-- HUNGARY SECTION -->
+          <div class="section" aria-label="Hungary RSVP section">
+            <div class="section-title" data-i18n="section_hungary_title">Hungary</div>
+            <div class="section-subtitle" data-i18n="section_hungary_subtitle">Budapest • Festetics Palace • August 15</div>
 
-          <label for="guests" data-i18n="label_guests">Number of guests</label>
-          <select id="guests" name="guests" required>
-            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
+            <label for="hungary_attendance" data-i18n="label_hungary_attendance">Will you attend the wedding in Hungary?</label>
+            <select id="hungary_attendance" name="hungary_attendance" required>
+              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+              <option value="Yes" data-i18n="opt_yes">Yes</option>
+              <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
+              <option value="No" data-i18n="opt_no">No</option>
+            </select>
 
-          <label for="guest_names" data-i18n="label_guest_names">Guest names</label>
-          <textarea
-            id="guest_names"
-            name="guest_names"
-            data-i18n-placeholder="ph_guest_names"
-            placeholder="Please list all attending guests (including yourself), one per line."
-          ></textarea>
+            <label for="hungary_guests" data-i18n="label_guests">Number of guests</label>
+            <select id="hungary_guests" name="hungary_guests" required>
+              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
 
-          <label for="hotel" data-i18n="label_hotel">Interested in hotel accommodation?</label>
-          <select id="hotel" name="hotel_accommodation_interest" required>
-            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
-            <!-- keep values stable for Formspree; only text is translated -->
-            <option value="Yes" data-i18n="opt_yes">Yes</option>
-            <option value="No" data-i18n="opt_no">No</option>
-          </select>
+            <label for="hungary_guest_names" data-i18n="label_guest_names">Guest names</label>
+            <textarea
+              id="hungary_guest_names"
+              name="hungary_guest_names"
+              data-i18n-placeholder="ph_guest_names"
+              placeholder="Please list all attending guests (including yourself), one per line."
+            ></textarea>
 
-          <label for="diet" data-i18n="label_diet">Food allergies or dietary preferences</label>
-          <textarea
-            id="diet"
-            name="food_allergies_preferences"
-            data-i18n-placeholder="ph_diet"
-            placeholder="e.g., vegetarian, vegan, gluten-free, nut allergy, etc."
-          ></textarea>
+            <label for="hungary_hotel" data-i18n="label_hotel">Interested in hotel accommodation?</label>
+            <select id="hungary_hotel" name="hungary_hotel_accommodation_interest" required>
+              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+              <option value="Yes" data-i18n="opt_yes">Yes</option>
+              <option value="No" data-i18n="opt_no">No</option>
+            </select>
 
-          <label for="song" data-i18n="label_song">One must-play wedding song</label>
-          <input
-            id="song"
-            name="must_play_song"
-            data-i18n-placeholder="ph_song"
-            placeholder="Artist — Song title"
-            autocomplete="off"
-          />
+            <label for="hungary_diet" data-i18n="label_diet">Food allergies or dietary preferences</label>
+            <textarea
+              id="hungary_diet"
+              name="hungary_food_allergies_preferences"
+              data-i18n-placeholder="ph_diet"
+              placeholder="e.g., vegetarian, vegan, gluten-free, nut allergy, etc."
+            ></textarea>
 
-          <!-- Wisconsin question LAST (right before submit) -->
-          <label for="wisconsin_party_interest" data-i18n="label_wisconsin">
-            Interested in attending the Wisconsin party? (date TBD)
-          </label>
-          <select id="wisconsin_party_interest" name="wisconsin_party_interest" required>
-            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
-            <!-- keep values stable; only text is translated -->
-            <option value="Yes" data-i18n="opt_yes">Yes</option>
-            <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
-            <option value="No" data-i18n="opt_no">No</option>
-          </select>
-          <label for="guests" data-i18n="label_guests">Number of guests</label>
-          <select id="guests" name="guests" required>
-            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
+            <label for="hungary_song" data-i18n="label_song">One must-play wedding song</label>
+            <input
+              id="hungary_song"
+              name="hungary_must_play_song"
+              data-i18n-placeholder="ph_song"
+              placeholder="Artist — Song title"
+              autocomplete="off"
+            />
+          </div>
 
-          <label for="guest_names" data-i18n="label_guest_names">Guest names</label>
-          <textarea
-            id="guest_names"
-            name="guest_names"
-            data-i18n-placeholder="ph_guest_names"
-            placeholder="Please list all attending guests (including yourself), one per line."
-          ></textarea>
+          <!-- WISCONSIN SECTION -->
+          <div class="section" aria-label="Wisconsin RSVP section">
+            <div class="section-title" data-i18n="section_wisconsin_title">Wisconsin</div>
+            <div class="section-subtitle" data-i18n="section_wisconsin_subtitle">Party • Date TBD</div>
+
+            <label for="wisconsin_attendance" data-i18n="label_wisconsin_attendance">Will you attend the Wisconsin party? (date TBD)</label>
+            <select id="wisconsin_attendance" name="wisconsin_attendance" required>
+              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+              <option value="Yes" data-i18n="opt_yes">Yes</option>
+              <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
+              <option value="No" data-i18n="opt_no">No</option>
+            </select>
+
+            <label for="wisconsin_guests" data-i18n="label_guests">Number of guests</label>
+            <select id="wisconsin_guests" name="wisconsin_guests" required>
+              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+
+            <label for="wisconsin_guest_names" data-i18n="label_guest_names">Guest names</label>
+            <textarea
+              id="wisconsin_guest_names"
+              name="wisconsin_guest_names"
+              data-i18n-placeholder="ph_guest_names"
+              placeholder="Please list all attending guests (including yourself), one per line."
+            ></textarea>
+
+            <!-- Same question set, even if hotel may not apply; keep for parity as requested -->
+            <label for="wisconsin_hotel" data-i18n="label_hotel">Interested in hotel accommodation?</label>
+            <select id="wisconsin_hotel" name="wisconsin_hotel_accommodation_interest" required>
+              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+              <option value="Yes" data-i18n="opt_yes">Yes</option>
+              <option value="No" data-i18n="opt_no">No</option>
+            </select>
+
+            <label for="wisconsin_diet" data-i18n="label_diet">Food allergies or dietary preferences</label>
+            <textarea
+              id="wisconsin_diet"
+              name="wisconsin_food_allergies_preferences"
+              data-i18n-placeholder="ph_diet"
+              placeholder="e.g., vegetarian, vegan, gluten-free, nut allergy, etc."
+            ></textarea>
+
+            <label for="wisconsin_song" data-i18n="label_song">One must-play wedding song</label>
+            <input
+              id="wisconsin_song"
+              name="wisconsin_must_play_song"
+              data-i18n-placeholder="ph_song"
+              placeholder="Artist — Song title"
+              autocomplete="off"
+            />
+          </div>
 
           <button type="submit" data-i18n="btn_submit">Submit RSVP</button>
         </form>
@@ -179,16 +230,22 @@
             heading_rsvp: "RSVP",
             subheading_date: "August 15 • Festetics Palace • Budapest, Hungary 🏰",
 
+            section_hungary_title: "Hungary",
+            section_hungary_subtitle: "Budapest • Festetics Palace • August 15",
+            section_wisconsin_title: "Wisconsin",
+            section_wisconsin_subtitle: "Party • Date TBD",
+
             label_name: "Name",
             label_email: "Email",
+
             label_hungary_attendance: "Will you attend the wedding in Hungary?",
+            label_wisconsin_attendance: "Will you attend the Wisconsin party? (date TBD)",
+
             label_guests: "Number of guests",
             label_guest_names: "Guest names",
             label_hotel: "Interested in hotel accommodation?",
             label_diet: "Food allergies or dietary preferences",
             label_song: "One must-play wedding song",
-
-            label_wisconsin: "Interested in attending the Wisconsin party? (date TBD)",
 
             opt_select_one: "Select one…",
             opt_yes: "Yes",
@@ -207,16 +264,22 @@
             heading_rsvp: "Visszajelzés (RSVP)",
             subheading_date: "Augusztus 15. • Festetics-palota • Budapest, Magyarország 🏰",
 
+            section_hungary_title: "Magyarország",
+            section_hungary_subtitle: "Budapest • Festetics-palota • Augusztus 15.",
+            section_wisconsin_title: "Wisconsin",
+            section_wisconsin_subtitle: "Buli • Időpont később",
+
             label_name: "Név",
             label_email: "Email",
+
             label_hungary_attendance: "Részt veszel a magyarországi esküvőn?",
+            label_wisconsin_attendance: "Részt vennél a wisconsini bulin? (időpont később)",
+
             label_guests: "Vendégek száma",
             label_guest_names: "Vendégek nevei",
             label_hotel: "Érdekel szálláslehetőség (hotel)?",
             label_diet: "Ételallergia vagy étkezési preferencia",
             label_song: "Kihagyhatatlan esküvői dal",
-
-            label_wisconsin: "Érdekel a wisconsini buli? (időpont később)",
 
             opt_select_one: "Válasszon egyet…",
             opt_yes: "Igen",
