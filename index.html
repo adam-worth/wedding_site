@@ -146,11 +146,6 @@
         margin: 0 auto 12px;
       }
 
-      .story-hint{
-        font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        color: rgba(148,163,184,.95);
-      }
-
       /* Mobile controls (only show on touch devices) */
       #mobileControls {
         display: none;
@@ -174,11 +169,24 @@
         font: 18px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         cursor: pointer;
         touch-action: none;
+
+        /* Prevent iOS text selection / copy callout */
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
       .dbtn:active,
       .dbtn.active {
         border-color: rgba(125, 211, 252, 0.7);
         background: rgba(2,6,23,.85);
+      }
+
+      /* Extra: prevent selection in the whole mobile control area */
+      #mobileControls, .dpad {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
       }
     </style>
   </head>
@@ -196,36 +204,26 @@
               <div class="story-row">
                 <!-- 8-bit groom (tux) -->
                 <svg class="pixel-svg floaty" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
-                  <!-- hair -->
                   <rect x="5" y="2" width="6" height="2" fill="#1f2937"/>
                   <rect x="4" y="3" width="1" height="2" fill="#1f2937"/>
                   <rect x="11" y="3" width="1" height="2" fill="#1f2937"/>
-                  <!-- face -->
                   <rect x="5" y="4" width="6" height="4" fill="#f1c27d"/>
-                  <!-- eyes -->
                   <rect x="6" y="5" width="1" height="1" fill="#0b0f14"/>
                   <rect x="9" y="5" width="1" height="1" fill="#0b0f14"/>
-                  <!-- tux jacket -->
                   <rect x="4" y="8" width="8" height="6" fill="#0b0f14"/>
-                  <!-- shirt -->
                   <rect x="7" y="8" width="2" height="6" fill="#e2e8f0"/>
-                  <!-- tie -->
                   <rect x="7" y="9" width="2" height="1" fill="#38bdf8"/>
-                  <!-- legs -->
                   <rect x="5" y="14" width="3" height="2" fill="#111827"/>
                   <rect x="8" y="14" width="3" height="2" fill="#111827"/>
                 </svg>
 
                 <!-- 8-bit ring -->
                 <svg class="pixel-svg pulse" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
-                  <!-- ring band -->
                   <rect x="6" y="5" width="4" height="1" fill="#fbbf24"/>
                   <rect x="5" y="6" width="1" height="5" fill="#fbbf24"/>
                   <rect x="10" y="6" width="1" height="5" fill="#fbbf24"/>
                   <rect x="6" y="11" width="4" height="1" fill="#fbbf24"/>
-                  <!-- inner hole -->
                   <rect x="6" y="6" width="4" height="5" fill="#0b0f14" opacity="0.55"/>
-                  <!-- gem -->
                   <rect x="7" y="3" width="2" height="2" fill="#a78bfa"/>
                   <rect x="7" y="3" width="2" height="1" fill="#ddd6fe" opacity="0.9"/>
                 </svg>
@@ -234,10 +232,6 @@
               <div class="story-text" data-i18n-html="story_text">
                 Oh no — the groom forgot the ring back at the hotel.<br />
                 Help him get to the bride in time before the wedding gets cancelled!
-              </div>
-
-              <div class="story-hint" data-i18n-html="story_hint">
-                Press <strong>Enter</strong> to start • Click/tap anywhere • Arrow keys / WASD to move • R to restart
               </div>
             </div>
           </div>
@@ -263,7 +257,7 @@
       </div>
 
       <div class="hud">
-        <div class="panel" data-i18n="hud_controls">Controls: Arrow keys / WASD • Enter to start • R to restart</div>
+        <div class="panel" data-i18n="hud_controls">Controls: Arrow keys / WASD • Enter or tap to start • R to restart</div>
         <div class="panel" data-i18n="hud_goal">Goal: Get the groom to the bride</div>
       </div>
 
@@ -285,12 +279,9 @@
             story_text:
               "Oh no — the groom forgot the ring back at the hotel.<br />" +
               "Help him get to the bride in time before the wedding gets cancelled!",
-            story_hint:
-              "Press <strong>Enter</strong> to start • Click/tap anywhere • Arrow keys / WASD to move • R to restart",
             rsvp_btn: "RSVP HERE",
-            hud_controls: "Controls: Arrow keys / WASD • Enter to start • R to restart",
+            hud_controls: "Controls: Arrow keys / WASD • Enter or tap to start • R to restart",
             hud_goal: "Goal: Get the groom to the bride",
-
             win_title: "YOU MADE IT!",
             win_lines: ["AUGUST 15", "FESTETICS PALACE", "BUDAPEST, HUNGARY  🏰"],
           },
@@ -300,12 +291,9 @@
             story_text:
               "Jaj ne — a vőlegény a hotelben felejtette a gyűrűt.<br />" +
               "Segíts neki időben eljutni a menyasszonyhoz, mielőtt elmarad az esküvő!",
-            story_hint:
-              "Nyomj <strong>Enter</strong>-t a kezdéshez • Kattints/érints bárhol • Nyilak / WASD a mozgáshoz • R az újrakezdéshez",
             rsvp_btn: "RSVP ITT",
             hud_controls: "Irányítás: Nyilak / WASD • Enter a kezdéshez • R az újrakezdéshez",
             hud_goal: "Cél: Juttasd el a vőlegényt a menyasszonyhoz",
-
             win_title: "SIKERÜLT!",
             win_lines: ["AUGUSZTUS 15.", "FESTETICS-PALOTA", "BUDAPEST, MAGYARORSZÁG  🏰"],
           },
@@ -472,6 +460,11 @@
 
             for (const btn of btns) {
               const dir = btn.dataset.dir;
+
+              // IMPORTANT: prevent form-submit defaults + iOS copy/select callouts
+              btn.type = "button";
+              btn.addEventListener("contextmenu", (e) => e.preventDefault());
+              btn.addEventListener("selectstart", (e) => e.preventDefault());
 
               const press = (e) => {
                 e.preventDefault();
@@ -682,12 +675,10 @@
             } else {
               drawWinModal();
               rsvpBtn.style.display = "inline-flex";
-              rsvpBtn.classList.add("win"); // make it red on win
+              rsvpBtn.classList.add("win");
             }
 
             drawFrame();
-
-            // Keep overlay visibility in sync (defensive)
             syncStoryOverlay();
           }
 
