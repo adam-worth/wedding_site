@@ -117,6 +117,18 @@
             autocomplete="off"
           />
 
+          <!-- Wisconsin question LAST (right before submit) -->
+          <label for="wisconsin_party_interest" data-i18n="label_wisconsin">
+            Interested in attending the Wisconsin party? (date TBD)
+          </label>
+          <select id="wisconsin_party_interest" name="wisconsin_party_interest" required>
+            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <!-- keep values stable; only text is translated -->
+            <option value="Yes" data-i18n="opt_yes">Yes</option>
+            <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
+            <option value="No" data-i18n="opt_no">No</option>
+          </select>
+
           <button type="submit" data-i18n="btn_submit">Submit RSVP</button>
         </form>
 
@@ -142,8 +154,11 @@
             label_diet: "Food allergies or dietary preferences",
             label_song: "One must-play wedding song",
 
+            label_wisconsin: "Interested in attending the Wisconsin party? (date TBD)",
+
             opt_select_one: "Select one…",
             opt_yes: "Yes",
+            opt_maybe: "Maybe",
             opt_no: "No",
 
             ph_guest_names: "Please list all attending guests (including yourself), one per line.",
@@ -166,8 +181,11 @@
             label_diet: "Ételallergia vagy étkezési preferencia",
             label_song: "Kihagyhatatlan esküvői dal",
 
+            label_wisconsin: "Érdekel a wisconsini buli? (időpont később)",
+
             opt_select_one: "Válasszon egyet…",
             opt_yes: "Igen",
+            opt_maybe: "Talán",
             opt_no: "Nem",
 
             ph_guest_names: "Kérjük, sorolja fel az összes résztvevő nevét (Önt is beleértve), soronként egyet.",
