@@ -160,14 +160,6 @@
       @media (pointer: coarse) {
         #mobileControls { display: flex; }
       }
-
-      .controlsStack {
-        display:flex;
-        flex-direction: column;
-        align-items:center;
-        gap: 10px;
-      }
-
       .dpad {
         display: grid;
         grid-template-columns: 56px 56px 56px;
@@ -187,21 +179,6 @@
       .dbtn.active {
         border-color: rgba(125, 211, 252, 0.7);
         background: rgba(2,6,23,.85);
-      }
-
-      .tiltBtn {
-        width: 220px;
-        height: 52px;
-        font-size: 14px;
-        letter-spacing: .06em;
-        text-transform: uppercase;
-      }
-
-      .tiltNote {
-        max-width: 320px;
-        text-align: center;
-        color: rgba(148,163,184,.95);
-        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       }
     </style>
   </head>
@@ -269,25 +246,18 @@
           <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html" data-i18n="rsvp_btn">RSVP HERE</a>
         </div>
 
-        <!-- MOBILE CONTROLS (shown only on touch devices) -->
+        <!-- MOBILE D-PAD (shown only on touch devices) -->
         <div id="mobileControls" aria-label="Touch controls">
-          <div class="controlsStack">
-            <button id="tiltBtn" class="dbtn tiltBtn" type="button" data-i18n="tilt_enable">ENABLE TILT</button>
-            <div class="tiltNote" id="tiltNote" data-i18n="tilt_note">
-              Tip: hold your phone how you want, then tap “Enable Tilt” to calibrate.
-            </div>
+          <div class="dpad">
+            <div></div>
+            <button class="dbtn" data-dir="up" aria-label="Up">▲</button>
+            <div></div>
 
-            <div class="dpad">
-              <div></div>
-              <button class="dbtn" data-dir="up" aria-label="Up">▲</button>
-              <div></div>
+            <button class="dbtn" data-dir="left" aria-label="Left">◀</button>
+            <button class="dbtn" data-dir="down" aria-label="Down">▼</button>
+            <button class="dbtn" data-dir="right" aria-label="Right">▶</button>
 
-              <button class="dbtn" data-dir="left" aria-label="Left">◀</button>
-              <button class="dbtn" data-dir="down" aria-label="Down">▼</button>
-              <button class="dbtn" data-dir="right" aria-label="Right">▶</button>
-
-              <div></div><div></div><div></div>
-            </div>
+            <div></div><div></div><div></div>
           </div>
         </div>
       </div>
@@ -320,11 +290,7 @@
             rsvp_btn: "RSVP HERE",
             hud_controls: "Controls: Arrow keys / WASD • Enter to start • R to restart",
             hud_goal: "Goal: Get the groom to the bride",
-            tilt_enable: "ENABLE TILT",
-            tilt_on: "TILT: ON",
-            tilt_off: "TILT: OFF",
-            tilt_denied: "Tilt permission denied",
-            tilt_note: "Tip: hold your phone how you want, then tap “Enable Tilt” to calibrate.",
+
             win_title: "YOU MADE IT!",
             win_lines: ["AUGUST 15", "FESTETICS PALACE", "BUDAPEST, HUNGARY  🏰"],
           },
@@ -339,11 +305,7 @@
             rsvp_btn: "RSVP ITT",
             hud_controls: "Irányítás: Nyilak / WASD • Enter a kezdéshez • R az újrakezdéshez",
             hud_goal: "Cél: Juttasd el a vőlegényt a menyasszonyhoz",
-            tilt_enable: "DÖNTÉS ENGEDÉLYEZÉSE",
-            tilt_on: "DÖNTÉS: BE",
-            tilt_off: "DÖNTÉS: KI",
-            tilt_denied: "A döntés engedélyezése elutasítva",
-            tilt_note: "Tipp: tartsd a telefont kényelmesen, majd nyomd meg a „Döntés engedélyezése” gombot a kalibráláshoz.",
+
             win_title: "SIKERÜLT!",
             win_lines: ["AUGUSZTUS 15.", "FESTETICS-PALOTA", "BUDAPEST, MAGYARORSZÁG  🏰"],
           },
@@ -390,13 +352,6 @@
           const GOAL_PAD = 4;
           const FLOOR_DOT_SIZE = 2;
 
-          // --- Tilt tuning (more responsive / smaller movement threshold) ---
-          // Lower deadzone = reacts to smaller tilts.
-          const TILT_DEADZONE = 2.5;   // degrees
-          const TILT_MAX_ANGLE = 18;   // degrees (clamp)
-          const TILT_SMOOTHING = 0.22; // 0..1
-          const TILT_GAIN = 1.15;      // multiplier for speed feel
-
           // Legend:
           // '=' wall
           // '.' floor
@@ -427,8 +382,8 @@
           function resize() {
             const pad = 24;
             const maxW = Math.max(320, window.innerWidth - pad);
-            const maxH = Math.max(240, window.innerHeight - 200); // leave room for tilt + dpad
-            const MAX_SCALE = 4; // allow a bit larger on mobile
+            const maxH = Math.max(240, window.innerHeight - 160); // leave room for D-pad
+            const MAX_SCALE = 3;
             const scale = Math.max(1, Math.min(MAX_SCALE, Math.floor(Math.min(maxW / W, maxH / H))));
             canvas.style.width = (W * scale) + "px";
             canvas.style.height = (H * scale) + "px";
@@ -513,7 +468,8 @@
 
           const mobileControls = document.getElementById("mobileControls");
           if (mobileControls) {
-            const btns = mobileControls.querySelectorAll(".dbtn[data-dir]");
+            const btns = mobileControls.querySelectorAll(".dbtn");
+
             for (const btn of btns) {
               const dir = btn.dataset.dir;
 
@@ -522,6 +478,7 @@
                 btn.classList.add("active");
                 activeDirs.add(dir);
 
+                // Start game if user presses D-pad while in story screen
                 if (state.screen === "story") {
                   state.screen = "play";
                   syncStoryOverlay();
@@ -539,115 +496,6 @@
               btn.addEventListener("pointercancel", release);
               btn.addEventListener("pointerleave", release);
             }
-          }
-
-          // --- Tilt controls (continuous analog movement) ---
-          const tiltBtn = document.getElementById("tiltBtn");
-          let tiltEnabled = false;
-
-          // Calibration: neutral is whatever pose the phone is held at when enabling
-          let tiltZero = { beta: null, gamma: null };
-
-          // Smoothed tilt vector used in update()
-          const tiltVec = { dx: 0, dy: 0 };
-
-          function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-          function angleToAxis(deltaDeg) {
-            const d = clamp(deltaDeg, -TILT_MAX_ANGLE, TILT_MAX_ANGLE);
-            const abs = Math.abs(d);
-            if (abs < TILT_DEADZONE) return 0;
-
-            // Map DEADZONE..MAX_ANGLE => 0..1 (continuous)
-            const norm = (abs - TILT_DEADZONE) / (TILT_MAX_ANGLE - TILT_DEADZONE);
-            return Math.sign(d) * clamp(norm, 0, 1);
-          }
-
-          function setTiltEnabled(on) {
-            tiltEnabled = on;
-            if (tiltBtn) tiltBtn.textContent = on ? t("tilt_on") : t("tilt_off");
-            if (!on) {
-              tiltVec.dx = 0;
-              tiltVec.dy = 0;
-              tiltZero.beta = null;
-              tiltZero.gamma = null;
-            }
-          }
-
-          // Default label
-          if (tiltBtn) tiltBtn.textContent = t("tilt_enable");
-
-          async function requestTiltPermissionIfNeeded() {
-            // iOS 13+ requires explicit permission for motion sensors
-            const needsPermission =
-              typeof DeviceMotionEvent !== "undefined" &&
-              typeof DeviceMotionEvent.requestPermission === "function";
-
-            if (!needsPermission) return true;
-
-            try {
-              const res = await DeviceMotionEvent.requestPermission();
-              return res === "granted";
-            } catch {
-              return false;
-            }
-          }
-
-          function onDeviceOrientation(e) {
-            if (!tiltEnabled) return;
-
-            const beta = typeof e.beta === "number" ? e.beta : 0;   // front/back
-            const gamma = typeof e.gamma === "number" ? e.gamma : 0; // left/right
-
-            // Calibrate on first valid event after enabling
-            if (tiltZero.beta === null || tiltZero.gamma === null) {
-              tiltZero.beta = beta;
-              tiltZero.gamma = gamma;
-            }
-
-            // Deltas relative to calibration pose
-            const dBeta = beta - tiltZero.beta;     // forward/back
-            const dGamma = gamma - tiltZero.gamma;  // left/right
-
-            // Convert angles to axes (continuous)
-            const targetDx = angleToAxis(dGamma) * TILT_GAIN;
-            const targetDy = angleToAxis(dBeta) * TILT_GAIN;
-
-            // Smooth (helps jitter on some devices)
-            tiltVec.dx = tiltVec.dx + (targetDx - tiltVec.dx) * TILT_SMOOTHING;
-            tiltVec.dy = tiltVec.dy + (targetDy - tiltVec.dy) * TILT_SMOOTHING;
-          }
-
-          // Use passive listener (won't block scrolling; stage already uses touch-action:none)
-          window.addEventListener("deviceorientation", onDeviceOrientation, { passive: true });
-
-          if (tiltBtn) {
-            tiltBtn.addEventListener("click", async (e) => {
-              e.preventDefault();
-
-              // Toggle off
-              if (tiltEnabled) {
-                setTiltEnabled(false);
-                return;
-              }
-
-              const ok = await requestTiltPermissionIfNeeded();
-              if (!ok) {
-                showErr(t("tilt_denied"));
-                return;
-              }
-
-              // Enable + re-calibrate
-              tiltZero.beta = null;
-              tiltZero.gamma = null;
-              setTiltEnabled(true);
-
-              // Nice UX: start game if still on story overlay
-              if (state.screen === "story") {
-                state.screen = "play";
-                syncStoryOverlay();
-              }
-            });
           }
 
           function reset() {
@@ -697,14 +545,6 @@
             const tv = dirVector();
             dx += tv.dx;
             dy += tv.dy;
-
-            // Tilt (continuous, responsive)
-            dx += tiltVec.dx;
-            dy += tiltVec.dy;
-
-            // If user uses multiple inputs at once, clamp to avoid huge speeds
-            dx = clamp(dx, -1.25, 1.25);
-            dy = clamp(dy, -1.25, 1.25);
 
             if (dx !== 0 && dy !== 0) {
               const inv = 1 / Math.sqrt(2);
@@ -842,10 +682,12 @@
             } else {
               drawWinModal();
               rsvpBtn.style.display = "inline-flex";
-              rsvpBtn.classList.add("win");
+              rsvpBtn.classList.add("win"); // make it red on win
             }
 
             drawFrame();
+
+            // Keep overlay visibility in sync (defensive)
             syncStoryOverlay();
           }
 
