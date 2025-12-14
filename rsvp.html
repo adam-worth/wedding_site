@@ -67,16 +67,18 @@
         </div>
 
         <form action="https://formspree.io/f/mblnwpqo" method="POST">
+          <!-- Hungary attendance question near the top -->
+          <label for="hungary_attendance" data-i18n="label_hungary_attendance">
+            Will you attend the wedding in Hungary?
+          </label>
+
           <label for="name" data-i18n="label_name">Name</label>
           <input id="name" name="name" autocomplete="name" required />
 
           <label for="email" data-i18n="label_email">Email</label>
           <input id="email" name="email" type="email" autocomplete="email" required />
 
-          <!-- Hungary attendance question near the top -->
-          <label for="hungary_attendance" data-i18n="label_hungary_attendance">
-            Will you attend the wedding in Hungary?
-          </label>
+          
           <select id="hungary_attendance" name="hungary_attendance" required>
             <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
             <!-- keep values stable; only text is translated -->
