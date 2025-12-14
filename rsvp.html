@@ -71,6 +71,13 @@
           <label for="hungary_attendance" data-i18n="label_hungary_attendance">
             Will you attend the wedding in Hungary?
           </label>
+          <select id="hungary_attendance" name="hungary_attendance" required>
+            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <!-- keep values stable; only text is translated -->
+            <option value="Yes" data-i18n="opt_yes">Yes</option>
+            <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
+            <option value="No" data-i18n="opt_no">No</option>
+          </select>
 
           <label for="name" data-i18n="label_name">Name</label>
           <input id="name" name="name" autocomplete="name" required />
@@ -79,13 +86,7 @@
           <input id="email" name="email" type="email" autocomplete="email" required />
 
           
-          <select id="hungary_attendance" name="hungary_attendance" required>
-            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
-            <!-- keep values stable; only text is translated -->
-            <option value="Yes" data-i18n="opt_yes">Yes</option>
-            <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
-            <option value="No" data-i18n="opt_no">No</option>
-          </select>
+          
 
           <label for="guests" data-i18n="label_guests">Number of guests</label>
           <select id="guests" name="guests" required>
