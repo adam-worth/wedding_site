@@ -73,6 +73,18 @@
           <label for="email" data-i18n="label_email">Email</label>
           <input id="email" name="email" type="email" autocomplete="email" required />
 
+          <!-- Hungary attendance question near the top -->
+          <label for="hungary_attendance" data-i18n="label_hungary_attendance">
+            Will you attend the wedding in Hungary?
+          </label>
+          <select id="hungary_attendance" name="hungary_attendance" required>
+            <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <!-- keep values stable; only text is translated -->
+            <option value="Yes" data-i18n="opt_yes">Yes</option>
+            <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
+            <option value="No" data-i18n="opt_no">No</option>
+          </select>
+
           <label for="guests" data-i18n="label_guests">Number of guests</label>
           <select id="guests" name="guests" required>
             <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
@@ -148,6 +160,7 @@
 
             label_name: "Name",
             label_email: "Email",
+            label_hungary_attendance: "Will you attend the wedding in Hungary?",
             label_guests: "Number of guests",
             label_guest_names: "Guest names",
             label_hotel: "Interested in hotel accommodation?",
@@ -175,6 +188,7 @@
 
             label_name: "Név",
             label_email: "Email",
+            label_hungary_attendance: "Részt veszel a magyarországi esküvőn?",
             label_guests: "Vendégek száma",
             label_guest_names: "Vendégek nevei",
             label_hotel: "Érdekel szálláslehetőség (hotel)?",
@@ -201,17 +215,14 @@
         const locale = lang.startsWith("hu") ? "hu" : "en";
         const t = (key) => (I18N[locale] && I18N[locale][key]) || I18N.en[key] || key;
 
-        // Set document language + title
         document.documentElement.lang = locale;
         document.title = t("page_title");
 
-        // Text nodes
         document.querySelectorAll("[data-i18n]").forEach((el) => {
           const key = el.getAttribute("data-i18n");
           el.textContent = t(key);
         });
 
-        // Placeholders
         document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
           const key = el.getAttribute("data-i18n-placeholder");
           el.setAttribute("placeholder", t(key));
