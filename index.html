@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Mobile-friendly: prevents double-tap zoom and helps touch controls feel “game-like” -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Wedding Maze</title>
     <style>
       :root { --bg: #2F455A; --fg: #e2e8f0; --muted: #94a3b8; }
@@ -41,6 +42,13 @@
         background: rgba(2, 6, 23, 0.45);
         box-shadow: 0 18px 60px rgba(0,0,0,0.45);
         overflow: hidden; /* helps the overlay match rounded corners */
+      }
+
+      /* Prevent touch scrolling/zoom gestures from fighting the game */
+      #stage, #game {
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
       }
 
       .rsvp-btn {
@@ -142,6 +150,36 @@
         font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
         color: rgba(148,163,184,.95);
       }
+
+      /* Mobile controls (only show on touch devices) */
+      #mobileControls {
+        display: none;
+        margin-top: 12px;
+        justify-content: center;
+      }
+      @media (pointer: coarse) {
+        #mobileControls { display: flex; }
+      }
+      .dpad {
+        display: grid;
+        grid-template-columns: 56px 56px 56px;
+        grid-template-rows: 56px 56px 56px;
+        gap: 10px;
+      }
+      .dbtn {
+        border-radius: 14px;
+        border: 2px solid rgba(148,163,184,.25);
+        background: rgba(2,6,23,.65);
+        color: rgba(226,232,240,.92);
+        font: 18px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        cursor: pointer;
+        touch-action: none;
+      }
+      .dbtn:active,
+      .dbtn.active {
+        border-color: rgba(125, 211, 252, 0.7);
+        background: rgba(2,6,23,.85);
+      }
     </style>
   </head>
   <body>
@@ -206,6 +244,21 @@
 
           <!-- Goes to rsvp.html (same tab) -->
           <a id="rsvpBtn" class="rsvp-btn" href="./rsvp.html" data-i18n="rsvp_btn">RSVP HERE</a>
+        </div>
+
+        <!-- MOBILE D-PAD (shown only on touch devices) -->
+        <div id="mobileControls" aria-label="Touch controls">
+          <div class="dpad">
+            <div></div>
+            <button class="dbtn" data-dir="up" aria-label="Up">▲</button>
+            <div></div>
+
+            <button class="dbtn" data-dir="left" aria-label="Left">◀</button>
+            <button class="dbtn" data-dir="down" aria-label="Down">▼</button>
+            <button class="dbtn" data-dir="right" aria-label="Right">▶</button>
+
+            <div></div><div></div><div></div>
+          </div>
         </div>
       </div>
 
@@ -329,7 +382,7 @@
           function resize() {
             const pad = 24;
             const maxW = Math.max(320, window.innerWidth - pad);
-            const maxH = Math.max(240, window.innerHeight - 120);
+            const maxH = Math.max(240, window.innerHeight - 160); // leave room for D-pad
             const MAX_SCALE = 3;
             const scale = Math.max(1, Math.min(MAX_SCALE, Math.floor(Math.min(maxW / W, maxH / H))));
             canvas.style.width = (W * scale) + "px";
@@ -401,6 +454,50 @@
           });
           window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
 
+          // --- Mobile D-pad support ---
+          const activeDirs = new Set();
+
+          function dirVector() {
+            let dx = 0, dy = 0;
+            if (activeDirs.has("left")) dx -= 1;
+            if (activeDirs.has("right")) dx += 1;
+            if (activeDirs.has("up")) dy -= 1;
+            if (activeDirs.has("down")) dy += 1;
+            return { dx, dy };
+          }
+
+          const mobileControls = document.getElementById("mobileControls");
+          if (mobileControls) {
+            const btns = mobileControls.querySelectorAll(".dbtn");
+
+            for (const btn of btns) {
+              const dir = btn.dataset.dir;
+
+              const press = (e) => {
+                e.preventDefault();
+                btn.classList.add("active");
+                activeDirs.add(dir);
+
+                // Start game if user presses D-pad while in story screen
+                if (state.screen === "story") {
+                  state.screen = "play";
+                  syncStoryOverlay();
+                }
+              };
+
+              const release = (e) => {
+                e.preventDefault();
+                btn.classList.remove("active");
+                activeDirs.delete(dir);
+              };
+
+              btn.addEventListener("pointerdown", press);
+              btn.addEventListener("pointerup", release);
+              btn.addEventListener("pointercancel", release);
+              btn.addEventListener("pointerleave", release);
+            }
+          }
+
           function reset() {
             state.screen = "play";
             state.groom.x = start.x * TILE + PLAYER_PAD;
@@ -437,10 +534,17 @@
 
             let dx = 0;
             let dy = 0;
+
+            // Keyboard
             if (keys.has("arrowleft") || keys.has("a")) dx -= 1;
             if (keys.has("arrowright") || keys.has("d")) dx += 1;
             if (keys.has("arrowup") || keys.has("w")) dy -= 1;
             if (keys.has("arrowdown") || keys.has("s")) dy += 1;
+
+            // Touch D-pad
+            const tv = dirVector();
+            dx += tv.dx;
+            dy += tv.dy;
 
             if (dx !== 0 && dy !== 0) {
               const inv = 1 / Math.sqrt(2);
