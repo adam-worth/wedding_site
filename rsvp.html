@@ -65,7 +65,6 @@
         border-top: 0;
       }
 
-      /* More “header-like” section headings */
       .section-head { margin: 0 0 10px; }
       .section-header {
         margin: 0;
@@ -99,16 +98,16 @@
       <div class="card">
         <h1 style="margin:0 0 6px;" data-i18n="heading_rsvp">RSVP</h1>
         <div class="small" data-i18n="subheading_date">
-          August 15 • Festetics Palota • Budapest, Hungary 🏰
+          August 15 • Festetics Palace • Budapest, Hungary 🏰
         </div>
 
         <form action="https://formspree.io/f/mblnwpqo" method="POST">
-          <!-- Shared contact info once -->
+          <!-- Shared contact info once (now optional) -->
           <label for="name" data-i18n="label_name">Name</label>
-          <input id="name" name="name" autocomplete="name" required />
+          <input id="name" name="name" autocomplete="name" />
 
           <label for="email" data-i18n="label_email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" required />
+          <input id="email" name="email" type="email" autocomplete="email" />
 
           <!-- HUNGARY SECTION -->
           <div class="section" aria-label="Hungary RSVP section">
@@ -118,16 +117,16 @@
             </div>
 
             <label for="hungary_attendance" data-i18n="label_hungary_attendance">Will you attend the wedding in Hungary?</label>
-            <select id="hungary_attendance" name="hungary_attendance" required>
-              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <select id="hungary_attendance" name="hungary_attendance">
+              <option value="" selected data-i18n="opt_select_one">Select one…</option>
               <option value="Yes" data-i18n="opt_yes">Yes</option>
               <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
               <option value="No" data-i18n="opt_no">No</option>
             </select>
 
             <label for="hungary_guests" data-i18n="label_guests">Number of guests</label>
-            <select id="hungary_guests" name="hungary_guests" required>
-              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <select id="hungary_guests" name="hungary_guests">
+              <option value="" selected data-i18n="opt_select_one">Select one…</option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -145,8 +144,8 @@
             ></textarea>
 
             <label for="hungary_hotel" data-i18n="label_hotel">Interested in hotel accommodation?</label>
-            <select id="hungary_hotel" name="hungary_hotel_accommodation_interest" required>
-              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <select id="hungary_hotel" name="hungary_hotel_accommodation_interest">
+              <option value="" selected data-i18n="opt_select_one">Select one…</option>
               <option value="Yes" data-i18n="opt_yes">Yes</option>
               <option value="No" data-i18n="opt_no">No</option>
             </select>
@@ -177,16 +176,16 @@
             </div>
 
             <label for="wisconsin_attendance" data-i18n="label_wisconsin_attendance">Will you attend the Wisconsin party? (date TBD)</label>
-            <select id="wisconsin_attendance" name="wisconsin_attendance" required>
-              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <select id="wisconsin_attendance" name="wisconsin_attendance">
+              <option value="" selected data-i18n="opt_select_one">Select one…</option>
               <option value="Yes" data-i18n="opt_yes">Yes</option>
               <option value="Maybe" data-i18n="opt_maybe">Maybe</option>
               <option value="No" data-i18n="opt_no">No</option>
             </select>
 
             <label for="wisconsin_guests" data-i18n="label_guests">Number of guests</label>
-            <select id="wisconsin_guests" name="wisconsin_guests" required>
-              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <select id="wisconsin_guests" name="wisconsin_guests">
+              <option value="" selected data-i18n="opt_select_one">Select one…</option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -204,8 +203,8 @@
             ></textarea>
 
             <label for="wisconsin_hotel" data-i18n="label_hotel">Interested in hotel accommodation?</label>
-            <select id="wisconsin_hotel" name="wisconsin_hotel_accommodation_interest" required>
-              <option value="" selected disabled data-i18n="opt_select_one">Select one…</option>
+            <select id="wisconsin_hotel" name="wisconsin_hotel_accommodation_interest">
+              <option value="" selected data-i18n="opt_select_one">Select one…</option>
               <option value="Yes" data-i18n="opt_yes">Yes</option>
               <option value="No" data-i18n="opt_no">No</option>
             </select>
