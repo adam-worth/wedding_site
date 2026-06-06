@@ -50,6 +50,12 @@
           inset 0 0 0 8px rgba(0, 0, 0, 0.18);
       }
 
+      .venue-scene {
+        position: relative;
+        border-bottom: 4px solid var(--line);
+        overflow: hidden;
+      }
+
       .venue {
         display: block;
         width: 100%;
@@ -58,28 +64,28 @@
         image-rendering: pixelated;
       }
 
-      .venue-scene {
-        position: relative;
-        border-bottom: 4px solid var(--line);
-        overflow: hidden;
-      }
-
       .travolta {
         position: absolute;
         left: 50%;
-        bottom: 8%;
-        z-index: 2;
-        width: min(190px, 30vw);
+        bottom: -8px;
+        z-index: 10;
+        width: min(280px, 42vw);
         height: auto;
         transform: translateX(-50%);
         opacity: 0;
         image-rendering: pixelated;
         pointer-events: none;
-        animation: revealTravolta 0.4s steps(4, end) 3s forwards;
+        animation: revealTravolta 0.6s ease-in 0.5s forwards;
       }
 
       @keyframes revealTravolta {
-        to { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -201,6 +207,11 @@
           height: 62vw;
         }
 
+        .travolta {
+          width: min(220px, 48vw);
+          bottom: -6px;
+        }
+
         .content {
           padding: 24px 18px;
         }
@@ -225,16 +236,18 @@
       }
     </style>
   </head>
+
   <body>
     <main class="screen">
       <section class="frame" aria-labelledby="title">
         <div class="venue-scene">
           <img class="venue" src="./pictures/venue.png" alt="Festetics Palota in Budapest" />
-          <img class="travolta" src="./pictures/john_travolta.gif" alt="" />
+          <img class="travolta" src="./pictures/john_travolta_clean.gif" alt="" />
         </div>
 
         <div class="content">
           <h1 id="title">Wedding Info</h1>
+
           <p class="subtitle">
             Our wedding celebration will take place at Festetics Palota in Budapest, Hungary.
           </p>
@@ -268,14 +281,18 @@
             <div class="detail">
               <span class="label">Hotel</span>
               <p>
-                Wedding party HQ: <a href="https://continentalhotelbudapest.com/en" target="_blank" rel="noopener">Continental Hotel Budapest</a>,
+                Wedding party HQ:
+                <a href="https://continentalhotelbudapest.com/en" target="_blank" rel="noopener">
+                  Continental Hotel Budapest
+                </a>,
                 Dohány utca 42-44.
               </p>
             </div>
           </div>
 
           <p class="note">
-            The couple and wedding party will be staying at Continental Hotel Budapest, should anyone feel inspired to gate crash (they reserve the right to call security however).
+            The couple and wedding party will be staying at Continental Hotel Budapest, should anyone feel inspired to gate crash
+            &#40;they reserve the right to call security however&#41;.
           </p>
 
           <div class="actions" aria-label="Wedding links">
