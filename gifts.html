@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wedding Registry</title>
+    <style>
+      :root {
+        --bg: #10161d;
+        --bg-deep: #070a0f;
+        --panel: #2f455a;
+        --panel-light: #3d5870;
+        --ink: #f7f1dc;
+        --muted: #c7d0d6;
+        --gold: #f7bf37;
+        --gold-dark: #8a4f1d;
+        --red: #b7413c;
+        --green: #68a45f;
+        --blue: #6aa7d8;
+        --line: #122336;
+        --shadow: rgba(0, 0, 0, 0.45);
+      }
+
+      * { box-sizing: border-box; }
+
+      html { min-height: 100%; }
+
+      body {
+        min-height: 100%;
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+          radial-gradient(circle at 50% 0, rgba(247, 191, 55, 0.14), transparent 34%),
+          linear-gradient(180deg, #182532 0%, var(--bg) 48%, #090d12 100%);
+        background-size: 8px 8px, 8px 8px, auto, auto;
+        font: 15px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+
+      a { color: inherit; }
+
+      .screen {
+        width: min(980px, calc(100vw - 24px));
+        margin: 0 auto;
+        padding: 18px 0 40px;
+      }
+
+      .shop-frame {
+        position: relative;
+        overflow: hidden;
+        border: 4px solid var(--line);
+        border-radius: 28px;
+        background: #273c50;
+        box-shadow:
+          0 20px 60px var(--shadow),
+          inset 0 0 0 4px rgba(255, 255, 255, 0.05),
+          inset 0 0 0 8px rgba(0, 0, 0, 0.18);
+      }
+
+      .shop-frame::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        pointer-events: none;
+        border: 2px solid rgba(9, 19, 31, 0.74);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+      }
+
+      .coin {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        z-index: 3;
+        width: 108px;
+        height: 94px;
+        object-fit: contain;
+        transform: translateX(-50%);
+        filter:
+          drop-shadow(0 0 14px rgba(247, 191, 55, 0.52))
+          drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.3));
+        image-rendering: pixelated;
+      }
+
+      header {
+        position: relative;
+        z-index: 2;
+        padding: 108px 28px 18px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 6vw, 4.25rem);
+        line-height: 0.92;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        color: #fff4c8;
+        text-shadow:
+          3px 3px 0 #0b1320,
+          5px 5px 0 rgba(0, 0, 0, 0.3);
+      }
+
+      .intro {
+        max-width: 690px;
+        margin: 16px auto 0;
+        color: var(--muted);
+      }
+
+      .shop-grid {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-top: 4px solid var(--line);
+      }
+
+      .gift-card {
+        min-height: 310px;
+        display: grid;
+        grid-template-rows: 178px 48px 34px auto;
+        align-items: start;
+        gap: 7px;
+        padding: 18px 18px 16px;
+        border-right: 4px solid var(--line);
+        border-bottom: 4px solid var(--line);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 42%),
+          var(--panel);
+        text-align: center;
+      }
+
+      .gift-card:nth-child(2n) { border-right: 0; }
+      .gift-card:nth-last-child(-n + 2) { border-bottom: 0; }
+
+      .gift-card.feature {
+        grid-template-columns: 1fr;
+        grid-template-rows: 178px 48px 34px auto;
+        align-items: start;
+        text-align: center;
+      }
+
+      .gift-card.custom {
+        grid-template-columns: 1fr;
+        grid-template-rows: 178px 48px 34px auto;
+        align-items: start;
+        text-align: center;
+        border-right: 0;
+        border-bottom: 0;
+      }
+
+      .gift-art {
+        align-self: center;
+        justify-self: center;
+        width: 230px;
+        height: 168px;
+        image-rendering: pixelated;
+        filter: drop-shadow(5px 7px 0 rgba(0, 0, 0, 0.25));
+      }
+
+      img.gift-art {
+        object-fit: contain;
+      }
+
+      .feature .gift-art {
+        grid-row: auto;
+        width: 250px;
+      }
+
+      .custom .gift-art {
+        grid-row: auto;
+      }
+
+      .guild-art {
+        width: 300px;
+      }
+
+      .gift-title {
+        align-self: center;
+        margin: 0;
+        color: #fff8e5;
+        font-size: clamp(1rem, 2.4vw, 1.15rem);
+        line-height: 1.15;
+        text-transform: uppercase;
+        text-shadow: 2px 2px 0 #121821;
+      }
+
+      .gift-title small {
+        display: block;
+        margin-top: 4px;
+        color: #ffe08a;
+        white-space: nowrap;
+      }
+
+      .gift-copy {
+        align-self: center;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+        text-transform: uppercase;
+      }
+
+      .gift-action {
+        align-self: end;
+        justify-self: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        min-width: 128px;
+        margin-top: 4px;
+        padding: 7px 12px;
+        border: 3px solid #101924;
+        border-radius: 0;
+        background: var(--gold);
+        color: #1b2430;
+        box-shadow:
+          inset 0 3px 0 rgba(255, 255, 255, 0.38),
+          inset 0 -3px 0 rgba(138, 79, 29, 0.36),
+          3px 3px 0 rgba(0, 0, 0, 0.32);
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .gift-action:hover,
+      .gift-action:focus-visible {
+        background: #ffd766;
+        outline: 2px solid rgba(255, 244, 200, 0.85);
+        outline-offset: 3px;
+      }
+
+      .feature .gift-action {
+        justify-self: center;
+      }
+
+      .footer-note {
+        position: relative;
+        z-index: 2;
+        margin: 0;
+        padding: 18px 26px 24px;
+        color: #d7e1e7;
+        background: rgba(9, 15, 24, 0.3);
+        text-align: center;
+        font-size: 12px;
+      }
+
+      @media (max-width: 600px) {
+        .screen {
+          width: min(100vw - 14px, 980px);
+          padding-top: 8px;
+        }
+
+        .shop-frame {
+          border-radius: 20px;
+        }
+
+        .shop-frame::before {
+          inset: 10px;
+        }
+
+        header {
+          padding: 70px 18px 18px;
+        }
+
+        .shop-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .gift-card,
+        .gift-card.feature,
+        .gift-card.custom {
+          grid-column: auto;
+          grid-template-columns: 1fr;
+          grid-template-rows: 148px 48px 34px auto;
+          min-height: 280px;
+          padding: 18px 16px;
+          border-right: 0;
+          border-bottom: 4px solid var(--line);
+          text-align: center;
+        }
+
+        .gift-card:nth-child(2n) { border-right: 0; }
+        .gift-card:nth-last-child(-n + 2) { border-bottom: 4px solid var(--line); }
+
+        .feature .gift-art {
+          grid-row: auto;
+        }
+
+        .custom .gift-art {
+          grid-row: auto;
+        }
+
+        .gift-art {
+          width: 214px;
+          height: 140px;
+        }
+
+        .feature .gift-art {
+          width: 230px;
+        }
+
+        .guild-art {
+          width: 260px;
+        }
+
+        .gift-card:last-child {
+          border-bottom: 0;
+        }
+
+        .feature .gift-action,
+        .gift-action {
+          justify-self: stretch;
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="screen">
+      <section class="shop-frame" aria-labelledby="gift-shop-title">
+        <img class="coin" src="./pictures/coin.png" alt="" />
+
+        <header>
+          <h1 id="gift-shop-title" data-i18n="title">Wedding Registry</h1>
+          <p class="intro" data-i18n="intro">
+            If you would like to send a wedding gift, choose a quest reward below.
+          </p>
+        </header>
+
+        <div class="shop-grid">
+          <article class="gift-card">
+            <img class="gift-art" src="./pictures/potion.png" alt="" />
+            <h2 class="gift-title" data-i18n-html="potion_title">Health Potion <small>(&euro;25)</small></h2>
+            <p class="gift-copy" data-i18n="potion_copy">Keeps newlyweds energized.</p>
+            <a class="gift-action" href="https://paypal.me/jordanberes0817/25EUR" target="_blank" rel="noopener" data-i18n="button">Send Gift</a>
+          </article>
+
+          <article class="gift-card">
+            <img class="gift-art" src="./pictures/cozy_cabin.jpeg" alt="" />
+            <h2 class="gift-title" data-i18n-html="inn_title">Cozy Inn Stay <small>(&euro;50)</small></h2>
+            <p class="gift-copy" data-i18n="inn_copy">Restores health and sanity.</p>
+            <a class="gift-action" href="https://paypal.me/jordanberes0817/50EUR" target="_blank" rel="noopener" data-i18n="button">Send Gift</a>
+          </article>
+
+          <article class="gift-card">
+            <img class="gift-art" src="./pictures/fancy_food.png" alt="" />
+            <h2 class="gift-title" data-i18n-html="rations_title">Luxury Rations <small>(&euro;75)</small></h2>
+            <p class="gift-copy" data-i18n="rations_copy">Something slightly better than ramen for once.</p>
+            <a class="gift-action" href="https://paypal.me/jordanberes0817/75EUR" target="_blank" rel="noopener" data-i18n="button">Send Gift</a>
+          </article>
+
+          <article class="gift-card feature">
+            <img class="gift-art" src="./pictures/voucher.png" alt="" />
+            <h2 class="gift-title" data-i18n-html="travel_title">Fast Travel Voucher <small>(&euro;100)</small></h2>
+            <p class="gift-copy" data-i18n="travel_copy">Teleportation to Japan for honeymoon.</p>
+            <a class="gift-action" href="https://paypal.me/jordanberes0817/100EUR" target="_blank" rel="noopener" data-i18n="button">Send Gift</a>
+          </article>
+
+          <article class="gift-card">
+            <img class="gift-art guild-art" src="./pictures/castle_upgrades.png" alt="" />
+            <h2 class="gift-title" data-i18n-html="guild_title">Castle Upgrade <small>(&euro;250+)</small></h2>
+            <p class="gift-copy" data-i18n="guild_copy">Help us upgrade our base of operations.</p>
+            <a class="gift-action" href="https://paypal.me/jordanberes0817/250EUR" target="_blank" rel="noopener" data-i18n="button">Send Gift</a>
+          </article>
+
+          <article class="gift-card custom">
+            <img class="gift-art" src="./pictures/treasure_chest.png" alt="" />
+            <h2 class="gift-title" data-i18n-html="custom_title">Custom Quest Reward <small>(&euro;&euro;&euro;)</small></h2>
+            <p class="gift-copy" data-i18n="custom_copy">Choose any amount of gold coins.</p>
+            <a class="gift-action" href="https://paypal.me/jordanberes0817" target="_blank" rel="noopener" data-i18n="custom_button">Choose Reward</a>
+          </article>
+        </div>
+
+        <p class="footer-note" data-i18n="note">
+          Your selected reward opens in a new tab. Please confirm the recipient before sending.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        const I18N = {
+          en: {
+            page_title: "Wedding Registry",
+            title: "Wedding Registry",
+            intro: "If you would like to send a wedding gift, choose a quest reward below or choose any amount.",
+            potion_title: "Health Potion <small>(&euro;25)<\/small>",
+            potion_copy: "Keeps newlyweds energized.",
+            inn_title: "Cozy Inn Stay <small>(&euro;50)<\/small>",
+            inn_copy: "Restores health and sanity.",
+            rations_title: "Luxury Rations <small>(&euro;75)<\/small>",
+            rations_copy: "Something better than Ramen",
+            travel_title: "Fast Travel Voucher <small>(&euro;100)<\/small>",
+            travel_copy: "Teleportation to Japan for honeymoon.",
+            guild_title: "Castle Upgrade <small>(&euro;250+)<\/small>",
+            guild_copy: "Help us upgrade our base of operations.",
+            custom_title: "Custom Quest Reward <small>(&euro;&euro;&euro;)<\/small>",
+            custom_copy: "Add any amount to the Beres Family vault.",
+            button: "Send Gift",
+            custom_button: "Choose Reward",
+            note: "Your selected reward opens in a new tab. Please confirm the recipient before sending.",
+          },
+          hu: {
+            page_title: "Esküvői ajándék",
+            title: "Esküvői ajándék",
+            intro: "Ha szeretnél esküvői ajándékot küldeni, válassz egy küldetésjutalmat lent, vagy adj bármilyen összeget a céh kincstárához.",
+            potion_title: "Életerő ital <small>(&euro;25)<\/small>",
+            potion_copy: "Energiával tölti fel az ifjú párt.",
+            inn_title: "Kényelmes fogadó <small>(&euro;50)<\/small>",
+            inn_copy: "Visszatölti az életet és a lelket.",
+            rations_title: "Luxus elemózsia <small>(&euro;75)<\/small>",
+            rations_copy: "Nászutas vacsora bónusz.",
+            travel_title: "Gyorsutazás kupon <small>(&euro;100)<\/small>",
+            travel_copy: "Teleport Japánba a nászútra.",
+            guild_title: "Kastély fejlesztés <small>(&euro;250+)<\/small>",
+            guild_copy: "Segíts fejleszteni a műveleti bázisunkat.",
+            custom_title: "Egyedi küldetésjutalom <small>(&euro;&euro;&euro;)<\/small>",
+            custom_copy: "Adj bármilyen összeget a céh kincstárához.",
+            button: "Ajándék küldése",
+            custom_button: "Jutalom választása",
+            note: "A kiválasztott jutalom új lapon nyílik meg. Küldés előtt ellenőrizd a címzettet.",
+          },
+        };
+
+        const lang = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+        const locale = lang.startsWith("hu") ? "hu" : "en";
+        const t = (key) => (I18N[locale] && I18N[locale][key]) || I18N.en[key] || key;
+
+        document.documentElement.lang = locale;
+        document.title = t("page_title");
+
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.getAttribute("data-i18n"));
+        });
+
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          el.innerHTML = t(el.getAttribute("data-i18n-html"));
+        });
+      })();
+    </script>
+  </body>
+</html>

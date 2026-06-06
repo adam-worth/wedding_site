@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dora & Jordan Wedding</title>
+    <style>
+      :root {
+        --bg: #f5efe4;
+        --panel: rgba(255, 251, 245, 0.88);
+        --panel-strong: rgba(255, 249, 240, 0.96);
+        --ink: #27313a;
+        --muted: #65717b;
+        --accent: #9f4f3f;
+        --accent-dark: #7b3628;
+        --line: rgba(39, 49, 58, 0.14);
+        --shadow: 0 18px 50px rgba(68, 45, 33, 0.14);
+      }
+
+      * { box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top, rgba(185, 153, 120, 0.22), transparent 42%),
+          linear-gradient(180deg, #f7f1e7 0%, #f3ebde 48%, #efe5d7 100%);
+        font: 16px/1.6 Georgia, "Times New Roman", serif;
+      }
+
+      a { color: inherit; }
+
+      .site {
+        width: min(1100px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+        align-items: stretch;
+        margin-bottom: 24px;
+      }
+
+      .hero-card,
+      .card,
+      #stage-shell,
+      .info-section {
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(6px);
+      }
+
+      .hero-copy {
+        padding: 40px;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        font: 700 12px/1.2 "Trebuchet MS", Arial, sans-serif;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.8rem, 6vw, 5rem);
+        line-height: 0.95;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+      }
+
+      .hero-subtitle {
+        margin: 18px 0 22px;
+        max-width: 40rem;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .meta-pill,
+      .maze-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid rgba(159, 79, 63, 0.2);
+        background: rgba(159, 79, 63, 0.08);
+        text-decoration: none;
+        font: 600 13px/1.2 "Trebuchet MS", Arial, sans-serif;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .maze-action {
+        background: var(--accent);
+        color: #fff9f2;
+        border-color: transparent;
+        cursor: pointer;
+      }
+
+      .maze-action:hover { background: var(--accent-dark); }
+      .maze-action:focus { outline: 2px solid rgba(159, 79, 63, 0.35); outline-offset: 2px; }
+
+      .hero-image {
+        min-height: 100%;
+        overflow: hidden;
+        padding: 14px;
+      }
+
+      .hero-image img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px;
+      }
+
+      .maze-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+        align-items: start;
+      }
+
+      #stage-shell {
+        padding: 22px;
+      }
+
+      #wrap { width: 100%; }
+      #gameBlock { width: 100%; }
+
+      #stage {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        padding: 10px;
+        border-radius: 22px;
+        border: 1px solid rgba(39, 49, 58, 0.12);
+        background: rgba(24, 32, 40, 0.92);
+        overflow: hidden;
+      }
+
+      canvas {
+        display: block;
+        margin: 0 auto;
+        background: #060a10;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+
+      #stage, #game {
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      .hud {
+        margin-top: 14px;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .panel,
+      .sidebar-card {
+        border: 1px solid rgba(39, 49, 58, 0.1);
+        border-radius: 18px;
+        padding: 14px 16px;
+        background: rgba(255, 250, 244, 0.78);
+        color: var(--muted);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+      }
+
+      .sidebar-card {
+        background: var(--panel-strong);
+        color: var(--ink);
+      }
+
+      .sidebar-card h2,
+      .info-section h2 {
+        margin: 0 0 10px;
+        font: 600 1.5rem/1.1 Georgia, "Times New Roman", serif;
+      }
+
+      .sidebar-card p,
+      .info-section p {
+        margin: 0;
+      }
+
+      .sidebar-stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .detail-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .detail {
+        padding-top: 12px;
+        border-top: 1px solid rgba(39, 49, 58, 0.08);
+      }
+
+      .detail:first-child {
+        padding-top: 0;
+        border-top: 0;
+      }
+
+      .detail-label {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font: 700 11px/1.2 "Trebuchet MS", Arial, sans-serif;
+      }
+
+      #err { display: none; margin-top: 12px; white-space: pre-wrap; }
+      noscript { display: block; margin-top: 12px; }
+
+      .win-cta {
+        position: absolute;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        display: none;
+        z-index: 20;
+      }
+
+      .story-overlay{
+        position:absolute;
+        inset:0;
+        border-radius: 22px;
+        display:none;
+        align-items:center;
+        justify-content:center;
+        text-align:center;
+        padding:22px;
+        box-sizing:border-box;
+        z-index:40;
+        background: rgba(2, 6, 23, 0.65);
+        border: 1px solid rgba(226, 232, 240, 0.12);
+        backdrop-filter: blur(2px);
+      }
+
+      .story-title{
+        font: 18px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+        color: #e2e8f0;
+      }
+
+      .story-row{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:16px;
+        margin: 10px 0 14px;
+      }
+
+      .pixel-svg{
+        width:72px;
+        height:72px;
+        image-rendering: pixelated;
+      }
+
+      .floaty{ animation: floaty 1.6s ease-in-out infinite; }
+      .pulse{ animation: pulse 1.2s ease-in-out infinite; }
+
+      @keyframes floaty{
+        0%,100%{ transform: translateY(0); }
+        50%{ transform: translateY(-6px); }
+      }
+      @keyframes pulse{
+        0%,100%{ transform: scale(1); }
+        50%{ transform: scale(1.06); }
+      }
+
+      .story-text{
+        font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        color: rgba(226,232,240,.92);
+        max-width: 560px;
+        margin: 0 auto 12px;
+      }
+
+      #mobileControls {
+        display: none;
+        margin-top: 12px;
+        justify-content: center;
+      }
+
+      @media (pointer: coarse) {
+        #mobileControls { display: flex; }
+      }
+
+      .dpad {
+        display: grid;
+        grid-template-columns: 56px 56px 56px;
+        grid-template-rows: 56px 56px 56px;
+        gap: 10px;
+      }
+
+      .dbtn {
+        border-radius: 14px;
+        border: 2px solid rgba(148,163,184,.25);
+        background: rgba(2,6,23,.65);
+        color: rgba(226,232,240,.92);
+        font: 18px/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        cursor: pointer;
+        touch-action: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .dbtn:active,
+      .dbtn.active {
+        border-color: rgba(125, 211, 252, 0.7);
+        background: rgba(2,6,23,.85);
+      }
+
+      #mobileControls, .dpad {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        margin-top: 24px;
+      }
+
+      .info-section {
+        padding: 24px;
+      }
+
+      .info-section p + p { margin-top: 10px; }
+
+      .info-section .meta-pill {
+        margin-top: 18px;
+        text-decoration: none;
+      }
+
+      @media (max-width: 900px) {
+        .hero,
+        .maze-layout,
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-copy,
+        .info-section,
+        #stage-shell {
+          padding: 24px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .site {
+          width: min(100vw - 20px, 1100px);
+          padding-top: 12px;
+        }
+
+        h1 { font-size: clamp(2.3rem, 12vw, 3.4rem); }
+
+        .hud {
+          grid-template-columns: 1fr;
+        }
+
+        .meta-pill,
+        .maze-action {
+          width: 100%;
+        }
+
+        .hero-meta {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="site">
+      <section class="maze-layout">
+        <div id="stage-shell">
+          <div id="wrap">
+            <div id="gameBlock">
+              <div id="stage">
+                <canvas id="game" aria-label="Wedding Maze"></canvas>
+
+                <div id="storyOverlay" class="story-overlay" aria-hidden="true">
+                  <div>
+                    <div class="story-title" data-i18n="prologue_title">Prologue</div>
+
+                    <div class="story-row">
+                      <svg class="pixel-svg floaty" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                        <rect x="5" y="2" width="6" height="2" fill="#1f2937"/>
+                        <rect x="4" y="3" width="1" height="2" fill="#1f2937"/>
+                        <rect x="11" y="3" width="1" height="2" fill="#1f2937"/>
+                        <rect x="5" y="4" width="6" height="4" fill="#f1c27d"/>
+                        <rect x="6" y="5" width="1" height="1" fill="#0b0f14"/>
+                        <rect x="9" y="5" width="1" height="1" fill="#0b0f14"/>
+                        <rect x="4" y="8" width="8" height="6" fill="#0b0f14"/>
+                        <rect x="7" y="8" width="2" height="6" fill="#e2e8f0"/>
+                        <rect x="7" y="9" width="2" height="1" fill="#38bdf8"/>
+                        <rect x="5" y="14" width="3" height="2" fill="#111827"/>
+                        <rect x="8" y="14" width="3" height="2" fill="#111827"/>
+                      </svg>
+
+                      <svg class="pixel-svg pulse" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">
+                        <rect x="6" y="5" width="4" height="1" fill="#fbbf24"/>
+                        <rect x="5" y="6" width="1" height="5" fill="#fbbf24"/>
+                        <rect x="10" y="6" width="1" height="5" fill="#fbbf24"/>
+                        <rect x="6" y="11" width="4" height="1" fill="#fbbf24"/>
+                        <rect x="6" y="6" width="4" height="5" fill="#0b0f14" opacity="0.55"/>
+                        <rect x="7" y="3" width="2" height="2" fill="#a78bfa"/>
+                        <rect x="7" y="3" width="2" height="1" fill="#ddd6fe" opacity="0.9"/>
+                      </svg>
+                    </div>
+
+                    <div class="story-text" data-i18n-html="story_text">
+                      Oh no — the groom forgot the ring back at the hotel.<br />
+                      Help him get to the bride in time before the wedding gets cancelled!
+                    </div>
+                  </div>
+                </div>
+
+                <button id="infoBtn" class="maze-action win-cta" type="button">View Wedding Info</button>
+              </div>
+
+              <div id="mobileControls" aria-label="Touch controls">
+                <div class="dpad">
+                  <div></div>
+                  <button class="dbtn" data-dir="up" aria-label="Up">▲</button>
+                  <div></div>
+
+                  <button class="dbtn" data-dir="left" aria-label="Left">◀</button>
+                  <button class="dbtn" data-dir="down" aria-label="Down">▼</button>
+                  <button class="dbtn" data-dir="right" aria-label="Right">▶</button>
+
+                  <div></div><div></div><div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hud">
+              <div class="panel" data-i18n="hud_controls">Controls: Arrow keys / WASD • Enter or tap to start • R to restart</div>
+              <div class="panel" data-i18n="hud_goal">Goal: Get the groom to the bride</div>
+              <div id="timerPanel" class="panel" data-i18n="hud_time">Time: 0.0s</div>
+            </div>
+
+            <div id="err" class="panel"></div>
+
+            <noscript>
+              <div class="panel">
+                This mini-game requires JavaScript. If you’re viewing this in a restricted preview that disables scripts,
+                open the file in a normal browser.
+              </div>
+            </noscript>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        const I18N = {
+          en: {
+            page_title: "Wedding Maze",
+            prologue_title: "Prologue",
+            story_text:
+              "Oh no — the groom forgot the ring back at the hotel.<br />" +
+              "Help him get to the bride in time before the wedding gets cancelled!",
+            hud_controls: "Controls: Arrow keys / WASD • Enter or tap to start • R to restart",
+            hud_goal: "Goal: Get the groom to the bride",
+            hud_time: "Time: 0.0s",
+            win_title: "YOU MADE IT!",
+            win_lines: ["AUGUST 15", "FESTETICS PALACE", "BUDAPEST, HUNGARY"],
+            win_time_label: "TIME",
+            win_cta: "BACK TO INFO",
+          },
+          hu: {
+            page_title: "Esküvői labirintus",
+            prologue_title: "Prológus",
+            story_text:
+              "Jaj ne — a vőlegény a hotelben felejtette a gyűrűt.<br />" +
+              "Segíts neki időben eljutni a menyasszonyhoz, mielőtt elmarad az esküvő!",
+            hud_controls: "Irányítás: Nyilak / WASD • Enter a kezdéshez • R az újrakezdéshez",
+            hud_goal: "Cél: Juttasd el a vőlegényt a menyasszonyhoz",
+            hud_time: "Idő: 0.0 mp",
+            win_title: "SIKERÜLT!",
+            win_lines: ["AUGUSZTUS 15.", "FESTETICS-PALOTA", "BUDAPEST, MAGYARORSZÁG"],
+            win_time_label: "IDŐ",
+            win_cta: "VISSZA AZ INFÓHOZ",
+          },
+        };
+
+        const lang = ((navigator.languages && navigator.languages[0]) || navigator.language || "en").toLowerCase();
+        const locale = lang.startsWith("hu") ? "hu" : "en";
+        const t = (key) => (I18N[locale] && I18N[locale][key]) || I18N.en[key] || key;
+
+        document.documentElement.lang = locale;
+        document.title = t("page_title");
+
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.getAttribute("data-i18n"));
+        });
+        document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+          el.innerHTML = t(el.getAttribute("data-i18n-html"));
+        });
+
+        const errEl = document.getElementById("err");
+        function showErr(e) {
+          errEl.style.display = "block";
+          errEl.textContent = String(e?.stack || e?.message || e);
+        }
+
+        window.addEventListener("error", (e) => showErr(e.error || e.message || e));
+        window.addEventListener("unhandledrejection", (e) => showErr(e.reason || e));
+
+        try {
+          const canvas = document.getElementById("game");
+          const ctx = canvas.getContext("2d", { alpha: false });
+          ctx.imageSmoothingEnabled = false;
+
+          const infoBtn = document.getElementById("infoBtn");
+          const timerEl = document.getElementById("timerPanel");
+          infoBtn.textContent = t("win_cta");
+          infoBtn.addEventListener("click", () => {
+            window.location.href = "./index.html";
+          });
+
+          const storyOverlay = document.getElementById("storyOverlay");
+
+          const TILE = 16;
+          const SPEED = 140;
+          const PLAYER_PAD = 4;
+          const GOAL_PAD = 4;
+          const FLOOR_DOT_SIZE = 2;
+
+          const MAP = [
+            "======================",
+            "=g...................=",
+            "=.==================.=",
+            "=.=...............=..=",
+            "=.=.=============.=.==",
+            "=.=.=.............=..=",
+            "=.=.=.=========.=.====",
+            "=...=.....=.....=....=",
+            "=.======.=.===.====.=",
+            "=..............=..b..=",
+            "======================",
+          ];
+
+          const COLS = MAP[0].length;
+          const ROWS = MAP.length;
+          const W = COLS * TILE;
+          const H = ROWS * TILE;
+
+          canvas.width = W;
+          canvas.height = H;
+
+          function resize() {
+            const stageShell = document.getElementById("stage-shell");
+            const maxW = Math.max(320, stageShell.clientWidth - 24);
+            const scale = Math.max(1, Math.floor(Math.min(maxW / W, 3)));
+            canvas.style.width = (W * scale) + "px";
+            canvas.style.height = (H * scale) + "px";
+          }
+
+          window.addEventListener("resize", resize);
+          resize();
+
+          function isWall(tx, ty) {
+            if (tx < 0 || ty < 0 || tx >= COLS || ty >= ROWS) return true;
+            return MAP[ty][tx] === "=";
+          }
+
+          let start = { x: 1, y: 1 };
+          let goal = { x: COLS - 2, y: ROWS - 2 };
+          for (let y = 0; y < ROWS; y++) {
+            for (let x = 0; x < COLS; x++) {
+              const ch = MAP[y][x];
+              if (ch === "g") start = { x, y };
+              if (ch === "b") goal = { x, y };
+            }
+          }
+
+          const state = {
+            screen: "story",
+            groom: {
+              x: start.x * TILE + PLAYER_PAD,
+              y: start.y * TILE + PLAYER_PAD,
+              w: TILE - PLAYER_PAD * 2,
+              h: TILE - PLAYER_PAD * 2,
+              speed: SPEED,
+            },
+            elapsed: 0,
+            finishedTime: null,
+          };
+
+          function formatTime(seconds) {
+            return seconds.toFixed(1) + "s";
+          }
+
+          function updateTimerHud() {
+            const label = locale === "hu" ? "Idő" : "Time";
+            const value = state.finishedTime == null ? state.elapsed : state.finishedTime;
+            timerEl.textContent = label + ": " + formatTime(value);
+          }
+
+          function startGame() {
+            state.screen = "play";
+            state.elapsed = 0;
+            state.finishedTime = null;
+            updateTimerHud();
+            syncStoryOverlay();
+          }
+
+          function syncStoryOverlay() {
+            const show = state.screen === "story";
+            storyOverlay.style.display = show ? "flex" : "none";
+            storyOverlay.setAttribute("aria-hidden", show ? "false" : "true");
+          }
+
+          syncStoryOverlay();
+          updateTimerHud();
+
+          storyOverlay.addEventListener("click", () => {
+            if (state.screen === "story") {
+              startGame();
+            }
+          });
+
+          const keys = new Set();
+          window.addEventListener("keydown", (e) => {
+            keys.add(e.key.toLowerCase());
+            if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(e.key)) e.preventDefault();
+
+            if (e.key === "Enter") {
+              if (state.screen === "story") {
+                startGame();
+                return;
+              }
+              if (state.screen === "win") reset();
+            }
+
+            if (e.key.toLowerCase() === "r") reset();
+            if (state.screen === "win" && e.key.toLowerCase() === "v") {
+              window.location.href = "./index.html";
+            }
+          });
+
+          window.addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
+
+          const activeDirs = new Set();
+
+          function dirVector() {
+            let dx = 0;
+            let dy = 0;
+            if (activeDirs.has("left")) dx -= 1;
+            if (activeDirs.has("right")) dx += 1;
+            if (activeDirs.has("up")) dy -= 1;
+            if (activeDirs.has("down")) dy += 1;
+            return { dx, dy };
+          }
+
+          const mobileControls = document.getElementById("mobileControls");
+          if (mobileControls) {
+            const btns = mobileControls.querySelectorAll(".dbtn");
+            for (const btn of btns) {
+              const dir = btn.dataset.dir;
+              btn.type = "button";
+              btn.addEventListener("contextmenu", (e) => e.preventDefault());
+              btn.addEventListener("selectstart", (e) => e.preventDefault());
+
+              const press = (e) => {
+                e.preventDefault();
+                btn.classList.add("active");
+                activeDirs.add(dir);
+                if (state.screen === "story") {
+                  startGame();
+                }
+              };
+
+              const release = (e) => {
+                e.preventDefault();
+                btn.classList.remove("active");
+                activeDirs.delete(dir);
+              };
+
+              btn.addEventListener("pointerdown", press);
+              btn.addEventListener("pointerup", release);
+              btn.addEventListener("pointercancel", release);
+              btn.addEventListener("pointerleave", release);
+            }
+          }
+
+          function reset() {
+            state.screen = "play";
+            state.elapsed = 0;
+            state.finishedTime = null;
+            state.groom.x = start.x * TILE + PLAYER_PAD;
+            state.groom.y = start.y * TILE + PLAYER_PAD;
+            updateTimerHud();
+            syncStoryOverlay();
+          }
+
+          function rectsOverlap(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+          }
+
+          function tryMove(dx, dy) {
+            const g = state.groom;
+            const next = { x: g.x + dx, y: g.y + dy, w: g.w, h: g.h };
+
+            const eps = 0.01;
+            const corners = [
+              { x: next.x, y: next.y },
+              { x: next.x + next.w - eps, y: next.y },
+              { x: next.x, y: next.y + next.h - eps },
+              { x: next.x + next.w - eps, y: next.y + next.h - eps },
+            ];
+
+            for (const c of corners) {
+              const tx = Math.floor(c.x / TILE);
+              const ty = Math.floor(c.y / TILE);
+              if (isWall(tx, ty)) return;
+            }
+
+            g.x = next.x;
+            g.y = next.y;
+          }
+
+          function update(dt) {
+            if (state.screen !== "play") return;
+            state.elapsed += dt;
+            updateTimerHud();
+
+            let dx = 0;
+            let dy = 0;
+            if (keys.has("arrowleft") || keys.has("a")) dx -= 1;
+            if (keys.has("arrowright") || keys.has("d")) dx += 1;
+            if (keys.has("arrowup") || keys.has("w")) dy -= 1;
+            if (keys.has("arrowdown") || keys.has("s")) dy += 1;
+
+            const tv = dirVector();
+            dx += tv.dx;
+            dy += tv.dy;
+
+            if (dx !== 0 && dy !== 0) {
+              const inv = 1 / Math.sqrt(2);
+              dx *= inv;
+              dy *= inv;
+            }
+
+            const speed = state.groom.speed;
+            if (dx !== 0) tryMove(dx * speed * dt, 0);
+            if (dy !== 0) tryMove(0, dy * speed * dt);
+
+            const bride = {
+              x: goal.x * TILE + GOAL_PAD,
+              y: goal.y * TILE + GOAL_PAD,
+              w: TILE - GOAL_PAD * 2,
+              h: TILE - GOAL_PAD * 2,
+            };
+
+            if (rectsOverlap(state.groom, bride)) {
+              state.finishedTime = state.elapsed;
+              state.screen = "win";
+              updateTimerHud();
+            }
+          }
+
+          function drawWallTile(x0, y0, tx, ty) {
+            const alt = ((tx + ty) % 2) === 0;
+            ctx.fillStyle = alt ? "#26313c" : "#2a3744";
+            ctx.fillRect(x0, y0, TILE, TILE);
+
+            ctx.fillStyle = "#141a22";
+            ctx.fillRect(x0, y0 + Math.floor(TILE / 2), TILE, 1);
+            const rowOffset = (ty % 2) ? Math.floor(TILE / 2) : 0;
+            ctx.fillRect(x0 + rowOffset, y0, 1, TILE);
+            ctx.fillRect(x0 + rowOffset + Math.floor(TILE / 2), y0, 1, TILE);
+
+            ctx.strokeStyle = "rgba(2, 6, 23, 0.45)";
+            ctx.strokeRect(x0 + 0.5, y0 + 0.5, TILE - 1, TILE - 1);
+          }
+
+          function drawFloorTile(x0, y0) {
+            ctx.fillStyle = "#F2F1DB";
+            ctx.fillRect(x0, y0, TILE, TILE);
+
+            const s = Math.max(1, Math.min(4, FLOOR_DOT_SIZE));
+            const cx = x0 + Math.floor(TILE / 2);
+            const cy = y0 + Math.floor(TILE / 2);
+            ctx.fillStyle = "rgba(148, 163, 184, 0.28)";
+            ctx.fillRect(cx - Math.floor(s / 2), cy - Math.floor(s / 2), s, s);
+          }
+
+          function drawGroom() {
+            const g = state.groom;
+            const x = Math.round(g.x);
+            const y = Math.round(g.y);
+            const w = Math.round(g.w);
+            const h = Math.round(g.h);
+
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = "#0c4a6e";
+            ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+          }
+
+          function drawBride() {
+            const bx = Math.round(goal.x * TILE + GOAL_PAD);
+            const by = Math.round(goal.y * TILE + GOAL_PAD);
+            const bw = Math.round(TILE - GOAL_PAD * 2);
+            const bh = Math.round(TILE - GOAL_PAD * 2);
+
+            ctx.fillStyle = "#f472b6";
+            ctx.fillRect(bx, by, bw, bh);
+            ctx.strokeStyle = "#831843";
+            ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+
+            ctx.fillStyle = "#fde68a";
+            ctx.fillRect(bx + Math.floor(bw / 2) - 2, by - 1, 1, 1);
+            ctx.fillRect(bx + Math.floor(bw / 2) + 1, by - 1, 1, 1);
+          }
+
+          function drawFrame() {
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.18)";
+            ctx.strokeRect(1, 1, W - 2, H - 2);
+            ctx.strokeStyle = "rgba(2, 6, 23, 0.55)";
+            ctx.strokeRect(3, 3, W - 6, H - 6);
+          }
+
+          function drawWinModal() {
+            ctx.fillStyle = "rgba(2, 6, 23, 0.86)";
+            ctx.fillRect(0, 0, W, H);
+
+            const pad = 12;
+            const boxX = pad;
+            const boxY = pad;
+            const boxW = W - pad * 2;
+            const boxH = H - pad * 2;
+
+            ctx.fillStyle = "#0b1220";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX + 1, boxY + 1, boxW - 2, boxH - 2);
+
+            ctx.fillStyle = "#e2e8f0";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = "16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+            ctx.fillText(t("win_title"), boxX + boxW / 2, boxY + 28);
+
+            ctx.font = "13px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+            const lines = t("win_lines");
+            const startY = boxY + 70;
+            const lineH = 18;
+            for (let i = 0; i < lines.length; i++) {
+              ctx.fillText(lines[i], boxX + boxW / 2, startY + i * lineH);
+            }
+
+            ctx.fillStyle = "#fbbf24";
+            ctx.font = "14px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+            const finalTime = state.finishedTime == null ? state.elapsed : state.finishedTime;
+            ctx.fillText(t("win_time_label") + ": " + formatTime(finalTime), boxX + boxW / 2, startY + lines.length * lineH + 14);
+          }
+
+          function draw() {
+            ctx.fillStyle = "#060a10";
+            ctx.fillRect(0, 0, W, H);
+
+            for (let y = 0; y < ROWS; y++) {
+              for (let x = 0; x < COLS; x++) {
+                const ch = MAP[y][x];
+                const x0 = x * TILE;
+                const y0 = y * TILE;
+                if (ch === "=") drawWallTile(x0, y0, x, y);
+                else drawFloorTile(x0, y0);
+              }
+            }
+
+            drawBride();
+            drawGroom();
+
+            if (state.screen !== "win") {
+              infoBtn.style.display = "none";
+            } else {
+              drawWinModal();
+              infoBtn.style.display = "inline-flex";
+            }
+
+            drawFrame();
+            syncStoryOverlay();
+          }
+
+          let last = performance.now();
+          function loop(now) {
+            const dt = Math.min(0.05, (now - last) / 1000);
+            last = now;
+            update(dt);
+            draw();
+            requestAnimationFrame(loop);
+          }
+
+          draw();
+          requestAnimationFrame(loop);
+        } catch (e) {
+          showErr(e);
+        }
+      })();
+    </script>
+  </body>
+</html>
