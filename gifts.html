@@ -68,14 +68,11 @@
       }
 
       .coin {
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        z-index: 3;
+        display: block;
         width: 108px;
         height: 94px;
+        margin: 0 auto 4px;
         object-fit: contain;
-        transform: translateX(-50%);
         filter:
           drop-shadow(0 0 14px rgba(247, 191, 55, 0.52))
           drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.3));
@@ -85,7 +82,7 @@
       header {
         position: relative;
         z-index: 2;
-        padding: 108px 28px 18px;
+        padding: 10px 28px 18px;
         text-align: center;
       }
 
@@ -262,7 +259,13 @@
         }
 
         header {
-          padding: 70px 18px 18px;
+          padding: 10px 18px 18px;
+        }
+
+        .coin {
+          width: 80px;
+          height: 70px;
+          margin-bottom: 12px;
         }
 
         .shop-grid {
@@ -321,9 +324,8 @@
   <body>
     <main class="screen">
       <section class="shop-frame" aria-labelledby="gift-shop-title">
-        <img class="coin" src="./pictures/coin.png" alt="" />
-
         <header>
+          <img class="coin" src="./pictures/coin.png" alt="" />
           <h1 id="gift-shop-title" data-i18n="title">Wedding Registry</h1>
           <p class="intro" data-i18n="intro">
             If you would like to send a wedding gift, choose a quest reward below.
